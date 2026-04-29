@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="metalSlug4/metalSlug4.vcxproj" Id="e1574c1f-a182-4aa3-9705-76f184a7116d" />
+</Solution>
