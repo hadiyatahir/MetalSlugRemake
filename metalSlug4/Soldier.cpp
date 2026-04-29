@@ -681,4 +681,4 @@ void PlayerSoldier::setupPlayer4Animations()
 
 //void PlayerSoldier::setupPlayer2Animations() { setupPlayer2Animations(); }
 //void PlayerSoldier::setupPlayer3Animations() { setupPlayer1Animations(); }
-//void PlayerSoldier::setupPlayer4Animations() { setupPlayer1Animations(); }
+//void PlayerSoldier::setupPlayer4Animations() { setupPlayer1Animations(); }bi
