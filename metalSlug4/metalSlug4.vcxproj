@@ -150,7 +150,12 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DamageableEntity.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityManager.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameState.h" />
+    <ClInclude Include="GameStateManager.h" />
+    <ClInclude Include="PauseState.h" />
+    <ClInclude Include="PlayState.h" />
     <ClInclude Include="Soldier.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
