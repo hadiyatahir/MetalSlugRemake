@@ -6,7 +6,7 @@
 
 class Game {
 private:
-    GameStateManager gsm;
+ /*   GameStateManager gsm;
     bool running;
 
 public:
@@ -21,7 +21,34 @@ public:
             gsm.update();
             gsm.render();
         }
-    }
+    }*/
+
+//private:
+//    sf::RenderWindow window;
+//    sf::Clock clock;
+//    GameStateManager gsm;
+//
+//    // Your existing constants move here
+//    static const int SCREEN_X = 1600;
+//    static const int SCREEN_Y = 900;
+//
+//public:
+//    Game();
+//    void run();
+//
+//private:
+//    void processEvents();
+//    void update(float dt);
+//    void render();
+
+    sf::RenderWindow window;
+    GameStateManager stateManager;
+public:
+    Game();
+    void run();
+
+
+
 };
 
 

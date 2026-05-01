@@ -142,7 +142,10 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="DamageableEntity.cpp" />
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="metalSlug4.cpp" />
+    <ClCompile Include="PlayState.cpp" />
     <ClCompile Include="Soldier.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +157,8 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="GameStateManager.h" />
+    <ClInclude Include="Level.h" />
+    <ClInclude Include="LevelManager.h" />
     <ClInclude Include="PauseState.h" />
     <ClInclude Include="PlayState.h" />
     <ClInclude Include="Soldier.h" />
