@@ -1,10 +1,24 @@
+// LevelManager.h
 #pragma once
-#ifndef LEVELMANAGER_H
-#define LEVELMANAGER_H
+#include "Level.h"
 
+class LevelManager
+{
+private:
+    Level* levels[4];    // 4 levels: 3 survival + 1 boss
+    int     currentIndex;
+    int     totalLevels;
 
-class LevelManager {
+public:
+    LevelManager();
+    ~LevelManager();
 
+    void loadLevel(int index);
+    void nextLevel();
+
+    Level* getCurrentLevel();
+    bool   isLastLevel() const;
+
+    void update(float dt);
+    void render(sf::RenderWindow& window);
 };
-
-#endif

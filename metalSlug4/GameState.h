@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 
-class GameState {
+class GameState {    //pure virtual fucntion for playstate etc to implement
 public:
     virtual void enter() = 0;
     virtual void exit() = 0;
@@ -14,6 +14,10 @@ public:
     virtual void render(sf::RenderWindow& window) = 0;
 
     virtual ~GameState() {}
+
+
+
+
 };
 
 
