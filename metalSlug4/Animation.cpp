@@ -85,3 +85,6 @@ bool Animation::isPlayingAnim() const {
 bool Animation::isFinished() const {
     return mfinished;
 }
+bool Animation::isLooping() const {
+    return misLooping;
+}

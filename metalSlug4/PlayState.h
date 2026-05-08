@@ -1,67 +1,77 @@
-//#pragma once
-//#ifndef PLAYSTATE_H
-//#define PLAYSTATE_H
-//#include "EntityManager.h"
-//#include "LevelManager.h"
+#pragma once
+#include "GameState.h"
+#include "Soldier.h"
+#include "LevelManager.h"
+#include "EntityManager.h"
+#include "Enemy.h"
+#include <SFML/Graphics.hpp>
+
 //
-//class PlayState : public GameState {
-////public:
-////    void enter() override {
-////        // initialize gameplay
-////    }
-////
-////    void update() override {
-////        // update player 
-////    }
-////
-////    void render() override {
-////        // draw game (later your partner connects animation)
-////    }
-////
-////    void exit() override {
-////        // cleanup
-////    }
+////owns level manager and entity manager
+//class PlayState : public GameState
+//{
+//    //LevelManager* levelManager;
+//    //EntityManager* entityManager;
 //
-//private:
-//    EntityManager entityManager;
-//    LevelManager levelManager;
+//    //int screenWidth;
+//    //int screenHeight;
+//
+//    //// Temporary: track player position for camera
+//    //// Later this comes from the player entity itself
+//    //float playerX;
+//    //float playerY;
+//
+//    LevelManager* levelManager;
+//
+//    PlayerSoldier* players[4];
+//    int playerCount;
+//
+//   // Enemies* enemies[20];
+//    int enemyCount;
+//
+//    int activePlayer;
+//
 //public:
-//    PlayState();
-//    void handleEvent(sf::Event& ev) override;
+//    PlayState(int screenW, int screenH);
+//    ~PlayState();
+//
+//    void exit() override;
+//
+//    void enter() override;
+//    void handleInput(sf::RenderWindow& window) override;
 //    void update(float dt) override;
 //    void draw(sf::RenderWindow& window) override;
 //};
-//
-//
-//
-//
-//
-//
-//
-//#endif // !PLAYSTATE_H
 
 
-#pragma once
-#include "GameState.h"
-#include "LevelManager.h"
-#include "EntityManager.h"
 
 class PlayState : public GameState
 {
-private:
-    LevelManager levelManager;
-    EntityManager entityManager;
+    LevelManager* levelManager;
 
-    int score;
-    bool levelComplete;
+    PlayerSoldier* players[4];
+    int            playerCount;
+    int            activePlayer;
+
+    Enemies* enemies[20];
+    int            enemyCount;
+
+    // level grid passed to soldier/enemy update
+    char** lvl;
+    int            lvlWidth;
+    int            lvlHeight;
+    int            cellSize;
+
+    int            screenWidth;
+    int            screenHeight;
 
 public:
-    PlayState();
-    ~PlayState() override;
+    PlayState(int screenW, int screenH);
+    ~PlayState();
 
-    void enter() override;
-    void exit() override;
-    void handleEvent(sf::Event& ev) override;
-    void update(float dt) override;
-    void render(sf::RenderWindow& window) override;
+    void enter()       override;
+    void exit()        override;
+    void handleInput(sf::RenderWindow& window) override;
+    void update(float dt)                      override;
+    void draw(sf::RenderWindow& window)        override;
 };

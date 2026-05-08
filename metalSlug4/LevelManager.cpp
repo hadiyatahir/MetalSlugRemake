@@ -1,63 +1,89 @@
-// LevelManager.cpp
 #include "LevelManager.h"
 
-LevelManager::LevelManager()
-    : currentIndex(-1), totalLevels(4)
+LevelManager::LevelManager(int screenW, int screenH)
+    : level(nullptr), camX(0), camY(0),
+    screenWidth(screenW), screenHeight(screenH)
 {
-    // Create all levels — dimensions from your project spec
-    // cell_size = 64, level 1 uses your existing 110 wide x 14 tall
-    levels[0] = new Level(110, 14, 64);   // Level 1 — your current grid
-    levels[1] = new Level(160, 20, 64);   // Level 2
-    levels[2] = new Level(200, 25, 64);   // Level 3
-    levels[3] = new Level(220, 30, 64);   // Boss level
 }
 
 LevelManager::~LevelManager()
 {
-    // Unload current level before destroying
-    if (currentIndex >= 0)
-        levels[currentIndex]->unload();
-
-    for (int i = 0; i < totalLevels; i++)
-        delete levels[i];
+    delete level;
+    level = nullptr;
 }
 
-void LevelManager::loadLevel(int index)
+// ============================================================
+// loadLevel
+// ============================================================
+// Creates the Level and fills in the tile grid.
+// RIGHT NOW this is hardcoded — later you'll load from a file
+// or use procedural generation.
+//
+// Level size: 110 wide, 14 tall, 64px per tile
+// (matches your original main.cpp)
+// ============================================================
+void LevelManager::loadLevel()
 {
-    if (index < 0 || index >= totalLevels) return;
+    // Delete old level if one exists
+    delete level;
+    level = new Level(110, 14, 64);
+    level->loadTextures();
 
-    // Unload current
-    if (currentIndex >= 0)
-        levels[currentIndex]->unload();
+    // --------------------------------------------------------
+    // Populate the grid
+    // This is where your level design lives for now.
+    // Each call sets one tile at (row, col).
+    // --------------------------------------------------------
 
-    currentIndex = index;
-    levels[currentIndex]->load();
+    // A ground floor at row 11
+    for (int col = 0; col < 110; col++)
+        level->setTile(11, col, 'g');
+
+    // A small raised platform
+    level->setTile(9, 20, 'g');
+    level->setTile(9, 21, 'g');
+    level->setTile(9, 22, 'g');
 }
 
-void LevelManager::nextLevel()
+// ============================================================
+// update — camera follow
+// ============================================================
+// We want the player centered horizontally on screen.
+//
+//   Ideal camX = playerX - screenWidth/2
+//
+// But we must clamp:
+//   - camX >= 0            (can't see before the level starts)
+//   - camX <= levelPixelW - screenWidth  (can't see past the end)
+//
+// Same logic vertically for camY.
+// ============================================================
+void LevelManager::update(float playerWorldX, float playerWorldY)
 {
-    loadLevel(currentIndex + 1);
+    if (level == nullptr) return;
+
+    // Desired camera position (player centered)
+    int desiredX = (int)playerWorldX - screenWidth / 2;
+    int desiredY = (int)playerWorldY - screenHeight / 2;
+
+    // Clamp horizontally
+    int maxCamX = level->getPixelWidth() - screenWidth;
+    if (desiredX < 0)        desiredX = 0;
+    if (desiredX > maxCamX)  desiredX = maxCamX;
+    if (maxCamX < 0)         desiredX = 0;   // level narrower than screen
+
+    // Clamp vertically
+    int maxCamY = level->getPixelHeight() - screenHeight;
+    if (desiredY < 0)        desiredY = 0;
+    if (desiredY > maxCamY)  desiredY = maxCamY;
+    if (maxCamY < 0)         desiredY = 0;
+
+    camX = desiredX;
+    camY = desiredY;
 }
 
-Level* LevelManager::getCurrentLevel()
+void LevelManager::draw(sf::RenderWindow& window)
 {
-    if (currentIndex < 0) return nullptr;
-    return levels[currentIndex];
-}
-
-bool LevelManager::isLastLevel() const
-{
-    return currentIndex >= totalLevels - 1;
-}
-
-void LevelManager::update(float dt)
-{
-    if (currentIndex >= 0)
-        levels[currentIndex]->update(dt);
-}
-
-void LevelManager::render(sf::RenderWindow& window)
-{
-    if (currentIndex >= 0)
-        levels[currentIndex]->render(window);
+    if (level == nullptr) return;
+    level->draw(window, camX, camY, screenWidth, screenHeight);
 }

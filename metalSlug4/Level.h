@@ -1,74 +1,48 @@
-//#pragma once
-//#ifndef LEVEL_H
-//#define LEVEL_H
-//
-//class Level {
-//    char** grid;
-//    int width, height, cellSize;
-//    sf::Texture wallTex;
-//    sf::Sprite wallSprite;
-//public:
-//    Level(int w, int h, int cellSize);
-//    ~Level();
-//    void draw(sf::RenderWindow& window);
-//    char getCell(int row, int col) const;
-//    void setCell(int row, int col, char val);
-//    int getWidth() const;
-//    int getHeight() const;
-//    int getCellSize() const;
-//};
-//
-//
-//
-//#endif // !LEVEL_H
-
-
-// Level.h
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "Tile.h"
+
+
+
+//owns the char** tile grid for one level
 
 class Level
 {
-private:
-    // ── Grid — this is your char** lvl, now properly typed ────
-    Tile** tileGrid;
-    int     width;
-    int     height;
-    int     cellSize;
+    char** grid;      // [row][col] — row = y, col = x
+    int    width;     //in tiles (columns)
+    int    height;    //in tiles (rows)
+    int    cellSize;  //pixels per tile (64)
 
-    // ── Textures for tiles ────────────────────────────────────
-    // Animation system replaces this later — for now we own it
-    sf::Texture grassTexture;
-    sf::Sprite  tileSprite;
+    // add these members
+    sf::Texture aerialBgTex;
+    sf::Texture plainsBgTex;
+    sf::Texture aquaticBgTex;
+    sf::Sprite  bgSprite;
 
-    // ── Camera / scroll ───────────────────────────────────────
-    float cameraX;   // how far we've scrolled horizontally
+    sf::Texture grassTex;
+    sf::Texture waterTex;
+    sf::Texture stoneTex;
+    sf::Sprite  tileSprite;  //same tile spirte reused for each tile
 
 public:
     Level(int width, int height, int cellSize);
     ~Level();
 
-    void load();    // builds the grid, loads textures
-    void unload();  // frees grid memory
+    char getTile(int row, int col) const;
+    void setTile(int row, int col, char tile);
 
-    void update(float dt);
-    void render(sf::RenderWindow& window);
+    void draw(sf::RenderWindow& window, int camX, int camY, int screenW, int screenH);  //rendering tiles within the camera rect
 
-    // ── Tile queries — EntityManager / Soldier call these ─────
-    bool isSolid(int tileX, int tileY)   const;
-    bool isInBounds(int tileX, int tileY) const;
+    bool isSolid(float worldX, float worldY) const;   //collision helper function
 
-    // ── For backward compatibility with your Soldier.h ────────
-    // Your Soldier::update takes char** lvl — we provide that view
-    // Eventually Soldier will call isSolid() directly instead
-    char getTileChar(int tileX, int tileY) const;
-    char** getRawGrid() const;  // temporary bridge — remove later
+    int getPixelWidth()  const { return width * cellSize; }
+    int getPixelHeight() const { return height * cellSize; }
+    int getCellSize()    const { return cellSize; }
+    int getWidth()       const { return width; }
+    int getHeight()      const { return height; }
 
-    // ── Getters ───────────────────────────────────────────────
-    int getWidth()    const { return width; }
-    int getHeight()   const { return height; }
-    int getCellSize() const { return cellSize; }
 
-    sf::Vector2f getPlayerStartPosition() const;
+    // add this method declaration
+    void drawBackground(sf::RenderWindow& window, int camX, int camY, int screenW, int screenH);
+
+    void loadTextures();
 };

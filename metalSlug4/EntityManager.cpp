@@ -1,120 +1,113 @@
-// EntityManager.cpp
-#include "EntityManager.h"
-#include "Level.h"
-
-EntityManager::EntityManager()
-    : players(nullptr),
-    playerCount(4),
-    activePlayerIndex(0),
-    currentLevel(nullptr)
-{
-}
-
-EntityManager::~EntityManager()
-{
-    clear();
-}
-
-void EntityManager::init(Level* level)
-{
-    currentLevel = level;
-
-    // ── This replaces your main() player setup ────────────────
-    // Your code:
-    //   PlayerSoldier* players = new PlayerSoldier[4]{0,1,2,3};
-    //   players[0].setPosition(600, 500); ...
-
-    players = new PlayerSoldier[playerCount]{
-        PlayerSoldier(0),
-        PlayerSoldier(1),
-        PlayerSoldier(2),
-        PlayerSoldier(3)
-    };
-
-    // Use level's defined start position
-    sf::Vector2f startPos = level->getPlayerStartPosition();
-    players[0].setPosition(startPos.x, startPos.y);
-    players[1].setPosition(startPos.x + 50.f, startPos.y);
-    players[2].setPosition(startPos.x + 100.f, startPos.y);
-    players[3].setPosition(startPos.x + 150.f, startPos.y);
-}
-
-void EntityManager::setLevel(Level* level)
-{
-    currentLevel = level;
-}
-
-void EntityManager::handleEvent(sf::Event& ev)
-{
-    // Z key switches active player — per project spec
-    if (ev.type == sf::Event::KeyPressed)
-    {
-        if (ev.key.code == sf::Keyboard::Z)
-        {
-            int tries = 0;
-            do {
-                activePlayerIndex = (activePlayerIndex + 1) % playerCount;
-                tries++;
-            } while (players[activePlayerIndex].isDead()
-                && tries < playerCount);
-        }
-    }
-}
-
-void EntityManager::update(float dt)
-{
-    if (!players || !currentLevel) return;
-
-    // ── This replaces your main() update loop ─────────────────
-    // Your code:
-    //   for(int i=0;i<4;i++)
-    //     players[i].update(dt, lvl, cell_size, width, height);
-
-    // Get the raw grid for backward compat with your Soldier.h
-    // Once Soldier uses Level::isSolid() this goes away
-    char** raw = currentLevel->getRawGrid();
-
-    for (int i = 0; i < playerCount; i++)
-    {
-        // Pass which player is active so only that one reads input
-        players[i].setActive(i == activePlayerIndex);
-        players[i].update(dt, raw,
-            currentLevel->getCellSize(),
-            currentLevel->getWidth(),
-            currentLevel->getHeight());
-    }
-
-    // Free the temporary raw grid
-    if (raw)
-    {
-        for (int i = 0; i < currentLevel->getHeight(); i++)
-            delete[] raw[i];
-        delete[] raw;
-    }
-}
-
-void EntityManager::render(sf::RenderWindow& window)
-{
-    if (!players) return;
-
-    // ── This replaces your main() draw loop ───────────────────
-    // Your code:
-    //   for(int i=0;i<4;i++) window.draw(players[i].getSprite());
-
-    for (int i = 0; i < playerCount; i++)
-        window.draw(players[i].getSprite());
-}
-
-bool EntityManager::allPlayersDead() const
-{
-    if (!players) return false;
-    for (int i = 0; i < playerCount; i++)
-        if (!players[i].isDead()) return false;
-    return true;
-}
-
-void EntityManager::clear()
-{
-    delete[] players;
-    players = nullptr;
-}
+//#include "EntityManager.h"
+//
+//EntityManager::EntityManager() : count(0)
+//{
+//    for (int i = 0; i < MAX_ENTITIES; i++)
+//        entities[i] = nullptr;
+//}
+//
+//EntityManager::~EntityManager()
+//{
+//    // We own every entity pointer — delete them all
+//    for (int i = 0; i < count; i++)
+//    {
+//        delete entities[i];
+//        entities[i] = nullptr;
+//    }
+//    count = 0;
+//}
+//
+//// ============================================================
+//// addEntity
+//// ============================================================
+//// Store the pointer at the next available slot.
+//// We take ownership — the caller must NOT delete the entity.
+//// ============================================================
+//void EntityManager::addEntity(Entity* e)
+//{
+//    if (count >= MAX_ENTITIES) return; // no room — drop it
+//    entities[count] = e;
+//    count++;
+//}
+//
+//// ============================================================
+//// update
+//// ============================================================
+//// Call update() on every active entity.
+//// Passing Level* lets entities do their own collision checks
+//// (e.g. player checks if the tile below is solid = gravity).
+//// After updating all, call cleanup() to remove dead ones.
+//// ============================================================
+//void EntityManager::update(float dt, Level* level)
+//{
+//    for (int i = 0; i < count; i++)
+//    {
+//        if (entities[i] != nullptr && entities[i]->isActive())
+//            entities[i]->update(dt, level);
+//    }
+//    cleanup();
+//}
+//
+//// ============================================================
+//// draw
+//// ============================================================
+//// Draw every active entity.
+//// camX/camY come from LevelManager — entities subtract them
+//// to convert world position -> screen position.
+//// ============================================================
+//void EntityManager::draw(sf::RenderWindow& window, int camX, int camY)
+//{
+//    for (int i = 0; i < count; i++)
+//    {
+//        if (entities[i] != nullptr && entities[i]->isActive())
+//            entities[i]->draw(window, camX, camY);
+//    }
+//}
+//
+//// ============================================================
+//// cleanup — compact the array
+//// ============================================================
+//// This removes "holes" left by deactivated entities.
+//// We do a two-pointer compaction:
+////   - 'write' starts at 0
+////   - 'read' scans every slot
+////   - if entities[read] is active: copy to entities[write], write++
+////   - if entities[read] is inactive: delete it, don't copy
+////
+//// After the loop: slots 0..write-1 are all active.
+//// Slots write..count-1 are garbage — zero them out.
+//// Set count = write.
+////
+//// WHY this approach?
+////   We need O(n) time and no extra memory.
+////   The order of entities doesn't matter for a game loop,
+////   so compacting (which changes order) is fine.
+//// ============================================================
+//void EntityManager::cleanup()
+//{
+//    int write = 0;
+//
+//    for (int read = 0; read < count; read++)
+//    {
+//        if (entities[read] == nullptr) continue;
+//
+//        if (entities[read]->isActive())
+//        {
+//            // Keep this entity — move it to the write position
+//            entities[write] = entities[read];
+//            write++;
+//        }
+//        else
+//        {
+//            // Dead entity — delete it and free the memory
+//            delete entities[read];
+//            entities[read] = nullptr;
+//        }
+//    }
+//
+//    // Zero out the now-unused tail of the array
+//    for (int i = write; i < count; i++)
+//        entities[i] = nullptr;
+//
+//    count = write;
+//}

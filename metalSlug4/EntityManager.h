@@ -1,56 +1,33 @@
 //#pragma once
-//#ifndef ENTITYMANAGER_H
 //#include "Entity.h"
+//#include <SFML/Graphics.hpp>
 //
 //
 //
-//class EntityManager {
-//    Entity** entities;      
-//    int entityCount;
-//    int entityCapacity;
+//class EntityManager
+//{
+//    static const int MAX_ENTITIES = 200;
+//
+//    Entity* entities[MAX_ENTITIES];
+//    int     count;   // how many slots are currently used
+//
 //public:
-//    EntityManager(int capacity);
+//    EntityManager();
 //    ~EntityManager();
-//    void addEntity(Entity* e);
-//    void removeEntity(int index);
-//    void updateAll(float dt, char** lvl, int cellSize, int w, int h);
-//    void drawAll(sf::RenderWindow& window);
-//};
 //
-//#endif // !ENTITYMANAGER_H
-
-
-
-// EntityManager.h
-#pragma once
-#include <SFML/Graphics.hpp>
-#include "Soldier.h"
-
-class Level; 
-
-class EntityManager
-{
-private:
-    PlayerSoldier* players;
-    int playerCount;
-    int activePlayerIndex;
-
-    Level* currentLevel;  
-
-public:
-    EntityManager();
-    ~EntityManager();
-
-    // Called by PlayState::enter() after level load
-    void init(Level* level);
-
-    // Called by PlayState when level changes
-    void setLevel(Level* level);
-
-    void handleEvent(sf::Event& ev);
-    void update(float dt);
-    void render(sf::RenderWindow& window);
-
-    bool allPlayersDead() const;
-    void clear();
-};
+//    // Add a new entity (must be heap-allocated, we take ownership)
+//    void addEntity(Entity* e);
+//
+//    // Run update on all active entities
+//    void update(float dt, class Level* level);
+//
+//    // Draw all active entities
+//    void draw(sf::RenderWindow& window, int camX, int camY);
+//
+//    // Remove inactive entities and compact the array
+//    void cleanup();
+//
+//    // Access for collision checks between entities
+//    int     getCount()               const { return count; }
+//    Entity* getEntity(int i)         const { return entities[i]; }
+//};

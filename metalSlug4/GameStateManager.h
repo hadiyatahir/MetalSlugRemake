@@ -1,84 +1,47 @@
-//#pragma once
-//#ifndef GAMESTATEMANAGER_H
-//#define GAMESTATEMANAGER_H
-//#include "GameState.h"
-//#include "PlayState.h"
-//
-//class GameStateManager {
-////private:
-////    GameState* currentState;      //composition
-////
-////public:
-////    GameStateManager() : currentState(nullptr) {}
-////
-////    void changeState(GameState* newState) {
-////        if (currentState != nullptr) {
-////            currentState->exit();
-////            delete currentState;
-////        }
-////        currentState = newState;
-////        currentState->enter();
-////    }
-////
-////    void update() {
-////        if (currentState)
-////            currentState->update();
-////    }
-////
-////    void render() {
-////        if (currentState)
-////            currentState->render();
-////    }
-//
-//private:
-//    GameState* currentState;
-//    GameState* pendingState;
-//    bool hasPending;
-//
-//public:
-//    GameStateManager();
-//    ~GameStateManager();
-//
-//    void setState(GameState* newState);
-//
-//    void handleEvent(sf::Event& ev);
-//    void update(float dt);
-//    void draw(sf::RenderWindow& window);
-//
-//
-//
-//    /*GameState* currentState;
-//public:
-//    void setState(GameState* newState);
-//    void handleEvent(sf::Event& ev);
-//    void update(float dt);
-//    void draw(sf::RenderWindow& window);*/
-//};
-//
-//
-//#endif // !GAMESTATEMANAGER_H
-
-
-
-// GameStateManager.h
 #pragma once
-#include <SFML/Graphics.hpp>
 #include "GameState.h"
+#include <SFML/Graphics.hpp>
 
+// ============================================================
+// GameStateManager.h
+// ============================================================
+// Manages which GameState is currently running.
+// Uses a fixed raw array of GameState pointers and an integer
+// 'count' to track how many states are currently loaded.
+//
+// The CURRENT (active) state is always states[count - 1].
+// States below it are paused but alive (e.g. Play under Pause).
+//
+// Three operations:
+//   addState()    -- load a new state on top of the current one
+//   removeState() -- destroy the current state, resume the one below
+//   switchState() -- destroy ALL states, load a single fresh one
+// ============================================================
+
+
+//this is responsible for knwoing which gamestate is currently running
 class GameStateManager
 {
-private:
-    GameState* currentState;    //switching bw playstate, menu state or pause state
-    GameState* pendingState;
-    bool hasPending;
+    static const int max_states = 8;
+    GameState* states[max_states];
+    int count;   // how many states are currently loaded
 
 public:
     GameStateManager();
     ~GameStateManager();
 
-    void setState(GameState* newState);
+    // loading a new state
+    void addState(GameState* newState);
 
-    void handleEvent(sf::Event& ev);
+    // destroying the current state
+    void removeState();
+
+    //switching to a new state while destroying the previous one
+    void switchState(GameState* newState);
+
+    bool isEmpty() const;
+
+    void handleInput(sf::RenderWindow& window);
     void update(float dt);
     void draw(sf::RenderWindow& window);
 };

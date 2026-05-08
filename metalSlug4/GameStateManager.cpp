@@ -1,103 +1,95 @@
-//#include "GameStateManager.h"
-//
-//GameStateManager::GameStateManager()
-//{
-//    currentState = nullptr;
-//}
-//
-//void GameStateManager::setState(GameState* newState)
-//{
-//    if (currentState != nullptr)
-//    {
-//        currentState->exit();
-//        delete currentState;
-//    }
-//
-//    currentState = newState;
-//
-//    if (currentState != nullptr)
-//    {
-//        currentState->enter();
-//    }
-//}
-//
-//void GameStateManager::handleEvent(sf::Event& ev)
-//{
-//    if (currentState)
-//        currentState->handleEvent(ev);
-//}
-//
-//void GameStateManager::update(float dt)
-//{
-//    if (currentState)
-//        currentState->update(dt);
-//}
-//
-//void GameStateManager::draw(sf::RenderWindow& window)
-//{
-//    if (currentState)
-//        currentState->render(window);
-//}
-
 #include "GameStateManager.h"
 
-GameStateManager::GameStateManager()
-    : currentState(nullptr),
-    pendingState(nullptr),
-    hasPending(false)
+
+GameStateManager::GameStateManager() : count(0)
 {
+    for (int i = 0; i < max_states; i++)
+        states[i] = nullptr;
 }
+
 
 GameStateManager::~GameStateManager()
 {
-    if (currentState)
+    for (int i = 0; i < max_states; i++)
     {
-        currentState->exit();
-        delete currentState;                   
+        if (states[i] != nullptr)
+        {
+            delete states[i];
+            states[i] = nullptr;
+        }
     }
-    if (pendingState)
-        delete pendingState;
+    count = 0;
 }
 
-void GameStateManager::setState(GameState* newState)
+void GameStateManager::addState(GameState* newState)
 {
-   
-    if (pendingState)
-        delete pendingState;             //adding pedning state to delay the switch between the states
-                                                //this is to avoid crashes of implemtnign logic on deleted objects
-    pendingState = newState;
-    hasPending = true;
+    if (count >= max_states) return;
+
+    states[count] = newState;
+    states[count]->enter();  
+    count++;
 }
 
-void GameStateManager::handleEvent(sf::Event& ev)
+void GameStateManager::removeState()
 {
-    if (currentState)
-        currentState->handleEvent(ev);
+    if (count == 0) return;
+
+    count--;
+    delete states[count];
+    states[count] = nullptr;
+}
+
+
+void GameStateManager::switchState(GameState* newState)
+{
+    // delete all loaded states
+    while (count > 0)
+        removeState();
+
+    addState(newState);
+}
+
+
+bool GameStateManager::isEmpty() const {
+    return count == 0; 
+}
+
+void GameStateManager::handleInput(sf::RenderWindow& window)
+{
+    if (count == 0) return;
+    states[count - 1]->handleInput(window);
 }
 
 void GameStateManager::update(float dt)
 {
-    if (hasPending)
-    {
-        if (currentState)
-        {
-            currentState->exit();
-            delete currentState;
-        }
-        currentState = pendingState;
-        pendingState = nullptr;
-        hasPending = false;
+    /*if (count == 0) return;
 
-        if (currentState)
-            currentState->enter();
+    states[count - 1]->update(dt);
+
+   
+    if (states[count - 1]->isDone)
+        removeState();*/
+
+    if (count == 0) return;
+
+    GameState* current = states[count - 1];
+    current->update(dt);
+
+    if (current->isDone)
+    {
+        GameState* next = current->nextState;
+
+        removeState(); // removes current
+
+        if (next)
+            addState(next);
     }
 
-    if (currentState)
-        currentState->update(dt);
+
 }
 
 void GameStateManager::draw(sf::RenderWindow& window)
 {
-    if (currentState)
-        currentState->render(window);
+    if (count == 0) return;
+    states[count - 1]->draw(window);
 }

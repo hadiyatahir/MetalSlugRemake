@@ -1,147 +1,125 @@
-// Level.cpp
 #include "Level.h"
 
 Level::Level(int w, int h, int cs)
-    : width(w), height(h), cellSize(cs),
-    tileGrid(nullptr), cameraX(0.f)
+    : width(w), height(h), cellSize(cs), grid(nullptr)
 {
-}
+    //allocating the array of row pointers
+    grid = new char* [height];
 
-Level::~Level()
-{
-    unload();
-}
-
-void Level::load()
-{
-    // ── Build tile grid ───────────────────────────────────────
-    // This is your main() code:
-    //   lvl = new char*[height];
-    //   for(i) lvl[i] = new char[width]{'\0'};
-    //   for(i<110) lvl[11][i] = 'g';
-    // Translated to Tile system:
-
-    tileGrid = new Tile * [height];
-    for (int i = 0; i < height; i++)
-        tileGrid[i] = new Tile[width];
-
-    // Ground row — your lvl[11][i] = 'g'
-    // Row 11 in a 14-high grid = height - 3
-    int groundRow = height - 3;
-    for (int x = 0; x < width; x++)
+    //allocating each row then filling it wiht null char
+    for (int row = 0; row < height; row++)
     {
-        tileGrid[groundRow][x] = Tile(TileType::GROUND);
-        tileGrid[groundRow + 1][x] = Tile(TileType::GROUND);
-        tileGrid[groundRow + 2][x] = Tile(TileType::GROUND);
-    }
-
-    // Bottom row = BEDROCK — indestructible per project spec
-    for (int x = 0; x < width; x++)
-        tileGrid[height - 1][x] = Tile(TileType::BEDROCK);
-
-    // ── Load textures ─────────────────────────────────────────
-    // This is your main() code:
-    //   wallTex1.loadFromFile("Sprites/blocks/grass_block_side.png");
-    //   wallSprite1.setTexture(wallTex1);
-
-    grassTexture.loadFromFile("Sprites/blocks/grass_block_side.png");
-    tileSprite.setTexture(grassTexture);
-}
-
-void Level::unload()
-{
-    if (tileGrid)
-    {
-        for (int i = 0; i < height; i++)
-            delete[] tileGrid[i];
-        delete[] tileGrid;
-        tileGrid = nullptr;
+        grid[row] = new char[width];
+        for (int col = 0; col < width; col++)
+            grid[row][col] = '\0';
     }
 }
 
-void Level::update(float dt)
+Level::~Level()  //opp of constructor
 {
-    // Rain, crater fill, animated tiles later
-    // Empty for now — but the function MUST exist
-    // so PlayState can call it without checking
+    if (grid == nullptr) return;
+
+    for (int row = 0; row < height; row++)
+    {
+        delete[] grid[row];
+        grid[row] = nullptr;
+    }
+    delete[] grid;
+    grid = nullptr;
 }
 
-void Level::render(sf::RenderWindow& window)
+void Level::loadTextures()
 {
-    // ── This is your display_level() function ─────────────────
-    // Your original:
-    //   for(i) for(j) if(lvl[i][j]=='g') { sprite.setPos; draw; }
+    grassTex.loadFromFile("Sprites/blocks/grass_block_side.png");
+    waterTex.loadFromFile("Sprites/blocks/water.png");
+    stoneTex.loadFromFile("Sprites/blocks/stone.png");
+}
 
-    if (!tileGrid) return;
+char Level::getTile(int row, int col) const
+{
+    if (row < 0 || row >= height || col < 0 || col >= width)
+        return '\0';  // treat out-of-bounds as empty
+    return grid[row][col];
+}
 
-    for (int i = 0; i < height; i++)
+void Level::setTile(int row, int col, char tile)
+{
+    if (row < 0 || row >= height || col < 0 || col >= width)
+        return;  // silently ignore out-of-bounds writes
+    grid[row][col] = tile;
+}
+
+// ============================================================
+// draw
+// ============================================================
+// The core optimization: only draw tiles that the camera
+// can actually see.
+//
+// camX / camY = world-pixel position of the camera's top-left.
+// (e.g. camX=192 means the camera has scrolled 192px right)
+//
+// We convert from pixel to tile index by dividing by cellSize.
+// startCol = first tile column that could be visible
+// endCol   = last tile column that could be visible (+2 buffer)
+//
+// The tile's SCREEN position = (tile world pos) - (camera pos)
+//   screen_x = col * cellSize - camX
+//   screen_y = row * cellSize - camY
+// ============================================================
+void Level::draw(sf::RenderWindow& window,
+    int camX, int camY,
+    int screenW, int screenH)
+{
+    // Calculate visible tile range — integer division gives us indices
+    int startCol = camX / cellSize;
+    int endCol = (camX + screenW) / cellSize + 1;
+
+    int startRow = camY / cellSize;
+    int endRow = (camY + screenH) / cellSize + 1;
+
+    // Clamp to valid grid bounds
+    if (startCol < 0)      startCol = 0;
+    if (endCol >= width) endCol = width - 1;
+    if (startRow < 0)      startRow = 0;
+    if (endRow >= height)endRow = height - 1;
+
+    for (int row = startRow; row <= endRow; row++)
     {
-        for (int j = 0; j < width; j++)
+        for (int col = startCol; col <= endCol; col++)
         {
-            TileType t = tileGrid[i][j].type;
-            if (t == TileType::AIR) continue;
+            char tile = grid[row][col];
+            if (tile == '\0') continue; // air — skip
 
-            // Position in world space, offset by camera scroll
-            float worldX = (float)(j * cellSize) - cameraX;
-            float worldY = (float)(i * cellSize);
+            // Pick which texture to use for this tile type
+            if (tile == 'g') tileSprite.setTexture(grassTex);
+            else if (tile == 'w') tileSprite.setTexture(waterTex);
+            else if (tile == 's') tileSprite.setTexture(stoneTex);
+            else continue; // unknown tile, skip
 
-            // Only draw tiles visible on screen (optimization)
-            if (worldX < -cellSize || worldX > 1600) continue;
+            // Convert world position to screen position
+            float screenX = (float)(col * cellSize - camX);
+            float screenY = (float)(row * cellSize - camY);
 
-            tileSprite.setPosition(worldX, worldY);
+            tileSprite.setPosition(screenX, screenY);
             window.draw(tileSprite);
         }
     }
 }
 
-bool Level::isInBounds(int x, int y) const
+// ============================================================
+// isSolid
+// ============================================================
+// Convert a world-pixel coordinate to a tile index,
+// then check if that tile is a solid block.
+// Used by Entity physics: "can I move here?"
+// ============================================================
+bool Level::isSolid(float worldX, float worldY) const
 {
-    return x >= 0 && x < width && y >= 0 && y < height;
-}
+    int col = (int)(worldX / cellSize);
+    int row = (int)(worldY / cellSize);
 
-bool Level::isSolid(int x, int y) const
-{
-    if (!isInBounds(x, y)) return true;  // treat edges as walls
-    return tileGrid[y][x].isSolid;
-}
+    char tile = getTile(row, col);
 
-char Level::getTileChar(int x, int y) const
-{
-    // Bridge for your existing Soldier.h which uses char comparison
-    // Soldier calls: if(lvl[row][col] == 'g') ...
-    // This gives that same answer without exposing the grid
-    if (!isInBounds(x, y)) return '\0';
-    switch (tileGrid[y][x].type)
-    {
-    case TileType::GROUND:  return 'g';
-    case TileType::BEDROCK: return 'b';
-    default:                return '\0';
-    }
-}
-
-char** Level::getRawGrid() const
-{
-    // TEMPORARY — lets your existing Soldier.update(dt, lvl, ...)
-    // keep working without changes right now
-    // You will remove this once Soldier uses isSolid() instead
-    if (!tileGrid) return nullptr;
-
-    // Build a char** on the fly that mirrors the tile grid
-    // This is called once per frame — acceptable for now
-    char** raw = new char* [height];
-    for (int i = 0; i < height; i++)
-    {
-        raw[i] = new char[width];
-        for (int j = 0; j < width; j++)
-            raw[i][j] = getTileChar(j, i);
-    }
-    return raw;
-}
-
-sf::Vector2f Level::getPlayerStartPosition() const
-{
-    // Row 11 * 64 = 704, minus player height ~94 = 610
-    // Matches your original player_y = 610
-    int groundRow = height - 3;
-    return sf::Vector2f(380.f, (float)(groundRow * cellSize - 94));
+    // Add more solid tiles here as you create them
+    return (tile == 'g' || tile == 's');
 }

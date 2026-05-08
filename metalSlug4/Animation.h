@@ -20,6 +20,9 @@ public:
     IntRect getCurrentFrame() const;
     bool isPlayingAnim() const;
     bool isFinished() const;  // true if nonlooping reached last frame
+
+    bool isLooping() const;
+
 private:
     IntRect mframes[32];
     int  mframeCount;

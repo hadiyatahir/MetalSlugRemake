@@ -1,74 +1,32 @@
-//#pragma once
-//#ifndef GAME_H
-//#define GAME_H
-//
-//#include "GameStateManager.h"
-//
-//class Game {
-//private:
-// /*   GameStateManager gsm;
-//    bool running;
-//
-//public:
-//    Game() : running(true) {}
-//
-//    void init() {
-//        gsm.changeState(new PlayState());
-//    }
-//
-//    void run() {
-//        while (running) {
-//            gsm.update();
-//            gsm.render();
-//        }
-//    }*/
-//
-////private:
-////    sf::RenderWindow window;
-////    sf::Clock clock;
-////    GameStateManager gsm;
-////
-////    // Your existing constants move here
-////    static const int SCREEN_X = 1600;
-////    static const int SCREEN_Y = 900;
-////
-////public:
-////    Game();
-////    void run();
-////
-////private:
-////    void processEvents();
-////    void update(float dt);
-////    void render();
-//
-//    sf::RenderWindow window;
-//    GameStateManager stateManager;
-//public:
-//    Game();
-//    void run();
-//
-//
-//
-//};
-//
-//
-//
-//
-//#endif // !GAME_H
-
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "GameStateManager.h"
-using namespace sf;
+
+// ============================================================
+// Game.h
+// ============================================================
+// The outermost shell of the application.
+// Owns: the window, the clock, the state manager.
+// Does: creates the initial state, then loops forever.
+//
+// Game::run() is the ONLY game loop. It:
+//   1. Measures delta time (time since last frame)
+//   2. Polls SFML window events (close button, etc.)
+//   3. Delegates input/update/draw to the state manager
+// ============================================================
 
 class Game
 {
-private:
-    RenderWindow window;
-    Clock clock;      // for real time difference
-    GameStateManager stateManager;
+    sf::RenderWindow window;
+    sf::Clock clock;
+    GameStateManager* stateManager;
+
+    int screenWidth;
+    int screenHeight;
+    //int selectedCharacter;
 
 public:
     Game();
-    void run();
+    ~Game();
+    void run();  // blocks until the window is closed
 };

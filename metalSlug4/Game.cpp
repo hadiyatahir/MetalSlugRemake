@@ -1,87 +1,51 @@
-//#include "Game.h"
-//#include "PlayState.h"
-//
-//Game::Game()
-//    : window(sf::VideoMode(1600, 900), "Metal Slug", sf::Style::Close)
-//{
-//    window.setVerticalSyncEnabled(true);
-//    window.setFramerateLimit(60);
-//
-//    // Initial state
-//    stateManager.setState(new PlayState());
-//}
-//
-//void Game::run()
-//{
-//    sf::Event ev;
-//
-//    while (window.isOpen())
-//    {
-//        // 🔹 Event handling
-//        while (window.pollEvent(ev))
-//        {
-//            if (ev.type == sf::Event::Closed)
-//                window.close();
-//
-//            stateManager.handleEvent(ev);
-//        }
-//
-//        // 🔹 Global input (optional)
-//        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-//        {
-//            window.close();
-//        }
-//
-//        float dt = 1.0f / 60.0f;
-//
-//        // 🔹 Update
-//        stateManager.update(dt);
-//
-//        // 🔹 Render
-//        window.clear();
-//        stateManager.draw(window);
-//        window.display();
-//    }
-//}
-
 #include "Game.h"
+#include "MenuState.h"
 #include "PlayState.h"
-using namespace sf;
 
 Game::Game()
-    : window(VideoMode(1600, 900), "Metal Slug", Style::Close)
+    : screenWidth(1600), screenHeight(900)   //game is responsible for creating the window, basically the game starts from here
 {
+    window.create(sf::VideoMode(screenWidth, screenHeight), "Metal Slug", sf::Style::Close);
     window.setVerticalSyncEnabled(true);
     window.setFramerateLimit(60);
 
-    stateManager.setState(new PlayState());
+    stateManager = new GameStateManager();
+    stateManager->addState(new MenuState());
 }
 
+Game::~Game()
+{
+    delete stateManager;
+    stateManager = nullptr;
+}
+
+//main run loop that will run until the window closes
 void Game::run()
 {
-    Event ev;
-
     while (window.isOpen())
     {
-     
-        float dt = clock.restart().asSeconds();    //not using fixed timestamp
-        if (dt > 0.05f) dt = 0.05f;  
+        float dt = clock.restart().asSeconds();     //dt is basically the seconds since last frame, so that it is frame and system independent
+        if (dt > 0.05f) dt = 0.05f;  // cap to prevent infinite loop
 
+        sf::Event ev;
         while (window.pollEvent(ev))
         {
             if (ev.type == sf::Event::Closed)
                 window.close();
-
-            stateManager.handleEvent(ev);
         }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-            window.close();
+    
+        //if (stateManager->isEmpty())     //if statemanager is emoty that means that menu state is no longer present and gameplay must proceed
+        //    stateManager->switchState(new PlayState(screenWidth, screenHeight));
 
-        stateManager.update(dt);
+        stateManager->handleInput(window);
+        stateManager->update(dt);
 
-        window.clear();
-        stateManager.draw(window);
+        window.clear(sf::Color::Black);
+        stateManager->draw(window);
         window.display();
+
+        //if (stateManager->isEmpty())
+        //    window.close();
     }
 }
