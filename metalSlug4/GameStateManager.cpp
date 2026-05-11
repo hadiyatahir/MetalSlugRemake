@@ -32,11 +32,15 @@ void GameStateManager::addState(GameState* newState)
 
 void GameStateManager::removeState()
 {
-    if (count == 0) return;
+    if (count == 0)
+        return;
+
+    states[count - 1]->exit();
+
+    delete states[count - 1];
+    states[count - 1] = nullptr;
 
     count--;
-    delete states[count];
-    states[count] = nullptr;
 }
 
 
@@ -70,19 +74,48 @@ void GameStateManager::update(float dt)
     if (states[count - 1]->isDone)
         removeState();*/
 
+    //if (count == 0) return;
+
+    //GameState* current = states[count - 1];
+    //current->update(dt);
+
+    //if (current->isDone)
+    //{
+    //    GameState* next = current->nextState;
+
+    //    removeState(); // removes current
+
+    //    if (next)
+    //        addState(next);
+    //}
+
+
     if (count == 0) return;
 
     GameState* current = states[count - 1];
     current->update(dt);
 
-    if (current->isDone)
+    // only mark transition, don't delete yet
+   /* if (current->isDone)
     {
         GameState* next = current->nextState;
 
-        removeState(); // removes current
+        current->exit();
+        removeState();
 
         if (next)
+        {
             addState(next);
+        }
+    }*/
+
+    if (current->isDone)
+    {
+        GameState* next = current->nextState;
+        current->nextState = nullptr;  // detach so removeState doesn't delete it
+        removeState();                 // this calls exit() and deletes current
+        if (next)
+            addState(next);            // this calls enter() on the new state
     }
 
 

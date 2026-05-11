@@ -177,11 +177,10 @@ class Animation;
 class EnemyAI
 {
 public:
-    // detectionRange : how close the player must be before the enemy starts walking
-    // attackRange    : how close the player must be before the enemy attacks
-    EnemyAI(float detectionRange = 400.f, float attackRange = 60.f);
+    EnemyAI(float detectionRange = 500.f, float attackRange = 70.f);        //dtection range is how close th eplyaer is for enemy to walk towards
+                                                                            //attakc range is how close the player is when enemy atacks
 
-    // Writes a new state into stateOut based on distance to the player.
+  
     // 0 = idle, 1 = walk, 2 = attack
     void update(float dt, int& stateOut, float distToPlayer, const Animation* currentAnim);
 
@@ -212,21 +211,27 @@ public:
     Enemies(int dmg, float spd, int hp);
     virtual ~Enemies();
 
-    virtual void update(float dt, char** lvl, int cell_size, int mapWidth, int mapHeight);
+    virtual void update(float dt, char** lvl, int cell_size, int mapWidth, int mapHeight, int biomeId);
     virtual void updateAI(float dt);
     virtual void updateCollisionForAnimation() {}
+
     virtual Enemies* getLandedReplacement() { return nullptr; }
 
     virtual void move(float dt) = 0;
     virtual void attack() = 0;
 
-    // ---- convenience setters ----
+   
     void setPosition(float x, float y);         // spawn position
-    void setScale(float scale);                  // uniform sprite + collision scale
+    void setScale(float scale);                  // uniform spr
     void setTarget(sf::Vector2f targetPos);      // call every frame with player position
 
     void addAnimation(const char* name, const Animation& anim);
     void setAnimation(const char* name);
+    void          takeDamage(int dmg);
+    int           getScoreValue()  const { return mScoreValue; }
+    sf::FloatRect getBounds()      const { return m_sprite.getGlobalBounds(); }
+    bool          wasJustKilled()  const { return mJustKilled; }
+    void          clearKillFlag() { mJustKilled = false; }
 
     Animation* getCurrentAnimation();
     sf::Sprite& getSprite();
@@ -236,7 +241,10 @@ public:
 
 protected:
     void copyName(char* dest, const char* src, int maxLen);
-    void physicsUpdate(float dt, char** lvl, int cell_size, int mapWidth, int mapHeight);
+    void physicsUpdate(float dt, char** lvl, int cell_size, int mapWidth, int mapHeight, int biomeId);
+  
+    int   mScoreValue = 50;
+    bool  mJustKilled = false;
 
 protected:
     int   damage;
@@ -246,10 +254,10 @@ protected:
 
     int m_state;    // 0 = idle, 1 = walk, 2 = attack
 
-    // composed AI
+    
     EnemyAI m_ai;
 
-    // target (player) position — updated each frame from outside
+  
     sf::Vector2f m_targetPos;
     bool         m_hasTarget;
 
@@ -263,7 +271,7 @@ protected:
     bool  onGround = false;
     float gravity = 0.8f;
 
-    // collision box — scaled automatically by setScale()
+    // collision 
     float collisionOffsetX = 4.f;
     float collisionOffsetY = 2.f;
     float collisionWidth = 24.f;

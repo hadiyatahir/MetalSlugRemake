@@ -12,52 +12,169 @@ LevelManager::~LevelManager()
     level = nullptr;
 }
 
-// ============================================================
-// loadLevel
-// ============================================================
-// Creates the Level and fills in the tile grid.
-// RIGHT NOW this is hardcoded — later you'll load from a file
-// or use procedural generation.
-//
-// Level size: 110 wide, 14 tall, 64px per tile
-// (matches your original main.cpp)
-// ============================================================
-void LevelManager::loadLevel()
+void LevelManager::loadLevel(int biomeId)
 {
-    // Delete old level if one exists
-    delete level;
-    level = new Level(110, 14, 64);
-    level->loadTextures();
+    //delete level;
+    //level = new level(110, 14, 64);
+    //level->loadtextures();
 
-    // --------------------------------------------------------
-    // Populate the grid
-    // This is where your level design lives for now.
-    // Each call sets one tile at (row, col).
-    // --------------------------------------------------------
+   
 
-    // A ground floor at row 11
-    for (int col = 0; col < 110; col++)
-        level->setTile(11, col, 'g');
+    //// a ground floor at row 11
+    //for (int col = 0; col < 110; col++)
+    //    level->settile(11, col, 'g');
 
-    // A small raised platform
-    level->setTile(9, 20, 'g');
-    level->setTile(9, 21, 'g');
-    level->setTile(9, 22, 'g');
+    //// a small raised platform
+    //level->settile(9, 20, 'g');
+   // //level->settile(9, 21, 'g');
+    //level->settile(9, 22, 'g');
+    
+        delete level;
+        level = new Level(150, 40, 64);
+        level->loadTextures();
+
+        // aerial biome — cols 0-36, high ground around row 4
+        //for (int col = 0; col < 37; col++)
+        //    level->setTile(4, col, 'g');
+
+        //// plains biome — cols 37-73, ground at row 11
+        //for (int col = 37; col < 74; col++)
+        //    level->setTile(11, col, 'g');
+
+        //// aquatic biome — cols 74-110, sea level row 8, water below
+        //for (int col = 74; col < 110; col++)
+        //{
+        //    level->setTile(8, col, 'g');   // sea floor
+        //    for (int row = 9; row < 14; row++)
+        //        level->setTile(row, col, 'w');  // water
+        //}
+ 
+
+        //    for (int col = 0; col < 150; col++)
+        //        level->setTile(10, col, 'g');
+
+
+        if (biomeId == 0) {
+            for (int col = 0; col < 150; col++)
+            {
+                level->setTile(18, col, 'g');
+                level->setTile(19, col, 'g');
+            }
+
+            for (int col = 8; col < 15; col++)
+                level->setTile(17, col, 'g');
+
+            for (int col = 15; col < 20; col++)
+                level->setTile(16, col, 'g');
+
+            for (int col = 32; col < 38; col++)
+                level->setTile(17, col, 'g');
+
+            for (int col = 38; col < 42; col++)
+                level->setTile(16, col, 'g');
+
+            for (int col = 12; col < 18; col++)
+                level->setTile(12, col, 'g');
+
+            for (int col = 25; col < 33; col++)
+                level->setTile(10, col, 'g');
+
+            for (int col = 45; col < 52; col++)
+                level->setTile(13, col, 'g');
+
+            for (int col = 60; col < 68; col++)
+                level->setTile(9, col, 'g');
+
+            for (int col = 80; col < 88; col++)
+                level->setTile(14, col, 'g');
+        }
+
+
+        if (biomeId == 1) {
+            for (int col = 0; col < 150; col++)
+            {
+                level->setTile(18, col, 's');
+                level->setTile(19, col, 's');
+            }
+
+            for (int col = 8; col < 15; col++)
+                level->setTile(17, col, 's');
+
+            for (int col = 15; col < 20; col++)
+                level->setTile(16, col, 's');
+
+            for (int col = 32; col < 38; col++)
+                level->setTile(17, col, 's');
+
+            for (int col = 38; col < 42; col++)
+                level->setTile(16, col, 's');
+
+            for (int col = 12; col < 18; col++)
+                level->setTile(12, col, 's');
+
+            for (int col = 25; col < 33; col++)
+                level->setTile(10, col, 's');
+
+            for (int col = 45; col < 52; col++)
+                level->setTile(13, col, 's');
+
+            for (int col = 60; col < 68; col++)
+                level->setTile(9, col, 's');
+
+            for (int col = 80; col < 88; col++)
+                level->setTile(14, col, 's');
+
+
+
+
+           /* for (int col = 0; col < 150; col++)
+            {
+                level->setTile(18, col, 'g');
+                level->setTile(19, col, 'g');
+            }
+
+            for (int col = 8; col < 15; col++)
+                level->setTile(17, col, 'g');
+
+            for (int col = 15; col < 20; col++)
+                level->setTile(16, col, 'g');
+
+            for (int col = 32; col < 38; col++)
+                level->setTile(17, col, 'g');
+
+            for (int col = 38; col < 42; col++)
+                level->setTile(16, col, 'g');
+
+            for (int col = 12; col < 18; col++)
+                level->setTile(12, col, 'g');
+
+            for (int col = 25; col < 33; col++)
+                level->setTile(10, col, 'g');
+
+            for (int col = 45; col < 52; col++)
+                level->setTile(13, col, 'g');
+
+            for (int col = 60; col < 68; col++)
+                level->setTile(9, col, 'g');
+
+            for (int col = 80; col < 88; col++)
+                level->setTile(14, col, 'g');*/
+        }
+
+
+        if (biomeId == 2) {
+
+        }
+       
+
+ 
+
 }
 
-// ============================================================
-// update — camera follow
-// ============================================================
-// We want the player centered horizontally on screen.
-//
-//   Ideal camX = playerX - screenWidth/2
-//
-// But we must clamp:
-//   - camX >= 0            (can't see before the level starts)
-//   - camX <= levelPixelW - screenWidth  (can't see past the end)
-//
-// Same logic vertically for camY.
-// ============================================================
+
+
+
+
 void LevelManager::update(float playerWorldX, float playerWorldY)
 {
     if (level == nullptr) return;

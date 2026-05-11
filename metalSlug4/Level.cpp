@@ -3,10 +3,12 @@
 Level::Level(int w, int h, int cs)
     : width(w), height(h), cellSize(cs), grid(nullptr)
 {
-    //allocating the array of row pointers
+
+    loadTextures();
+    
     grid = new char* [height];
 
-    //allocating each row then filling it wiht null char
+    
     for (int row = 0; row < height; row++)
     {
         grid[row] = new char[width];
@@ -31,8 +33,11 @@ Level::~Level()  //opp of constructor
 void Level::loadTextures()
 {
     grassTex.loadFromFile("Sprites/blocks/grass_block_side.png");
-    waterTex.loadFromFile("Sprites/blocks/water.png");
-    stoneTex.loadFromFile("Sprites/blocks/stone.png");
+    //waterTex.loadFromFile("Sprites/blocks/water.png");
+   stoneTex.loadFromFile("Sprites/blocks/stone.png");
+    plainsBgTex.loadFromFile("Sprites/Biomes/plainsH.png");
+    aerialBgTex.loadFromFile("Sprites/Biomes/aerialH.png");
+    aquaticBgTex.loadFromFile("Sprites/Biomes/aquaticH.png");
 }
 
 char Level::getTile(int row, int col) const
@@ -45,27 +50,11 @@ char Level::getTile(int row, int col) const
 void Level::setTile(int row, int col, char tile)
 {
     if (row < 0 || row >= height || col < 0 || col >= width)
-        return;  // silently ignore out-of-bounds writes
+        return;  
     grid[row][col] = tile;
 }
 
-// ============================================================
-// draw
-// ============================================================
-// The core optimization: only draw tiles that the camera
-// can actually see.
-//
-// camX / camY = world-pixel position of the camera's top-left.
-// (e.g. camX=192 means the camera has scrolled 192px right)
-//
-// We convert from pixel to tile index by dividing by cellSize.
-// startCol = first tile column that could be visible
-// endCol   = last tile column that could be visible (+2 buffer)
-//
-// The tile's SCREEN position = (tile world pos) - (camera pos)
-//   screen_x = col * cellSize - camX
-//   screen_y = row * cellSize - camY
-// ============================================================
+
 void Level::draw(sf::RenderWindow& window,
     int camX, int camY,
     int screenW, int screenH)
@@ -106,13 +95,9 @@ void Level::draw(sf::RenderWindow& window,
     }
 }
 
-// ============================================================
-// isSolid
-// ============================================================
-// Convert a world-pixel coordinate to a tile index,
-// then check if that tile is a solid block.
-// Used by Entity physics: "can I move here?"
-// ============================================================
+
+
+
 bool Level::isSolid(float worldX, float worldY) const
 {
     int col = (int)(worldX / cellSize);
@@ -120,6 +105,224 @@ bool Level::isSolid(float worldX, float worldY) const
 
     char tile = getTile(row, col);
 
-    // Add more solid tiles here as you create them
     return (tile == 'g' || tile == 's');
+
+
+
+}
+
+
+
+//void Level::drawBackground(sf::RenderWindow& window, int camX, int camY, int screenW, int screenH)
+//{
+//    //int centerCol = (camX + screenW / 2) / cellSize;
+//    //if (centerCol < 0)      centerCol = 0;
+//    //if (centerCol >= width) centerCol = width - 1;
+//
+//    //// adjust column ranges to match your biome layout
+//    //if (centerCol < 37)
+//    //    bgSprite.setTexture(plainsBgTex);
+//    //else if (centerCol < 74)
+//    //    bgSprite.setTexture(aerialBgTex);
+//    //else
+//    //    bgSprite.setTexture(aquaticBgTex);
+//    //if (centerCol < 37)
+//    //{
+//    //   /* bgSprite.setTexture(plainsBgTex);
+//    //    float scaleX = (float)screenW / plainsBgTex.getSize().x;
+//    //    float scaleY = (float)screenH / plainsBgTex.getSize().y;
+//    //    bgSprite.setScale(scaleX, scaleY);*/
+//
+//    //    bgSprite.setTexture(plainsBgTex);
+//
+//    //    bgSprite.setTextureRect(
+//    //        sf::IntRect(camX, 0, screenW, screenH)
+//    //    );
+//
+//    //    bgSprite.setPosition(0.f, 0.f);
+//
+//    //    window.draw(bgSprite);
+//
+//
+//    //}
+//    //else if (centerCol < 74)
+//    //{
+//    //   /* bgSprite.setTexture(aerialBgTex);
+//    //    float scaleX = (float)screenW / aerialBgTex.getSize().x;
+//    //    float scaleY = (float)screenH / aerialBgTex.getSize().y;
+//    //    bgSprite.setScale(scaleX, scaleY);*/
+//    //    bgSprite.setTexture(plainsBgTex);
+//
+//    //    int bgWidth = plainsBgTex.getSize().x;
+//
+//    //    int bgCamX = camX;
+//
+//    //    if (bgCamX < 0)
+//    //        bgCamX = 0;
+//
+//    //    if (bgCamX > bgWidth - screenW)
+//    //        bgCamX = bgWidth - screenW;
+//
+//
+//    //    bgSprite.setTextureRect(
+//    //        sf::IntRect(bgCamX, 0, screenW, screenH)
+//    //    );
+//
+//    //    bgSprite.setPosition(0.f, 0.f);
+//
+//    //    window.draw(bgSprite);
+//
+//    //}
+//    //else
+//    //{
+//    //   /* bgSprite.setTexture(aquaticBgTex);
+//    //    float scaleX = (float)screenW / aquaticBgTex.getSize().x;
+//    //    float scaleY = (float)screenH / aquaticBgTex.getSize().y;
+//    //    bgSprite.setScale(scaleX, scaleY);*/
+//    //    bgSprite.setTexture(plainsBgTex);
+//
+//    //    bgSprite.setTextureRect(
+//    //        sf::IntRect(camX, 0, screenW, screenH)
+//    //    );
+//
+//    //    bgSprite.setPosition(0.f, 0.f);
+//
+//    //    window.draw(bgSprite);
+//
+//
+//    int centerCol = (camX + screenW / 2) / cellSize;
+//
+//    if (centerCol < 0) centerCol = 0;
+//    if (centerCol >= width) centerCol = width - 1;
+//
+//    // choose texture
+//    if (centerCol < 37)
+//        bgSprite.setTexture(plainsBgTex);
+//    else if (centerCol < 74)
+//        bgSprite.setTexture(aerialBgTex);
+//    else
+//        bgSprite.setTexture(aquaticBgTex);
+//
+//    // MANUAL texture size (NO Vector2u)
+//    int texWidth = bgSprite.getTexture()->getSize().x;
+//
+//    int bgCamX = camX;
+//
+//    // clamp camera so we don't go outside texture
+//    int maxX = texWidth - screenW;
+//    if (maxX < 0)
+//        maxX = 0;
+//
+//    if (bgCamX < 0)
+//        bgCamX = 0;
+//
+//    if (bgCamX > maxX)
+//        bgCamX = maxX;
+//
+//    bgSprite.setTextureRect(sf::IntRect(bgCamX, 0, screenW, screenH));
+//
+//    bgSprite.setPosition(0.f, 0.f);
+//
+//    window.draw(bgSprite);
+//
+//    
+//
+//   /* bgSprite.setPosition(0.f, 0.f);
+//    window.draw(bgSprite);*/
+//}
+
+
+
+
+void Level::drawBackground(sf::RenderWindow& window, int camX, int camY, int screenW, int screenH)
+{
+    //int centerCol = (camX + screenW / 2) / cellSize;
+
+    //if (centerCol < 0) centerCol = 0;
+    //if (centerCol >= width) centerCol = width - 1;
+
+    //sf::Texture* tex;
+
+    //if (centerCol < 37)
+    //    tex = nullptr;
+    //else if (centerCol < 74)
+    //    tex = nullptr;
+    //else
+    //    tex = nullptr;
+
+    //// we avoid pointers completely → direct selection
+    //if (centerCol < 37)
+    //    bgSprite.setTexture(plainsBgTex);
+    //else if (centerCol < 74)
+    //    bgSprite.setTexture(aerialBgTex);
+    //else
+    //    bgSprite.setTexture(aquaticBgTex);
+
+    //int texWidth = bgSprite.getTexture()->getSize().x;
+
+    //int offsetX = camX % texWidth;
+
+    //// first draw
+    //bgSprite.setTextureRect(sf::IntRect(offsetX, 0, screenW, screenH));
+    //bgSprite.setPosition(0.f, 0.f);
+    //window.draw(bgSprite);
+
+    //// wrap draw
+    //bgSprite.setTextureRect(sf::IntRect(0, 0, screenW, screenH));
+    //bgSprite.setPosition((float)(texWidth - offsetX), 0.f);
+    //window.draw(bgSprite);
+
+
+   /* bgSprite.setTexture(currentBackgroundTexture);
+
+    int texWidth = currentBackgroundTexture.getSize().x;
+
+    int offsetX = camX;
+
+    bgSprite.setTextureRect(sf::IntRect(offsetX, 0, screenW, screenH));
+    bgSprite.setPosition(0.f, 0.f);
+
+    window.draw(bgSprite);*/
+
+    //if (biomeId == 0)
+    //    bgSprite.setTexture(plainsBgTex);
+
+    //else if (biomeId == 1)
+    //    bgSprite.setTexture(aerialBgTex);
+
+    //else
+    //    bgSprite.setTexture(aquaticBgTex);
+
+
+
+
+    //bgSprite.setPosition(-camX, -camY);
+
+  
+    //window.draw(bgSprite);
+
+    bgSprite.setTexture(currentBackgroundTexture);
+    bgSprite.setPosition(-camX, -camY);
+    window.draw(bgSprite);
+
+
+
+}
+
+
+
+void Level::setBiome(int biome)
+{
+    biomeId = biome;
+
+    if (biome == 0)
+        currentBackgroundTexture = plainsBgTex;
+    else if (biome == 1)
+        currentBackgroundTexture = aerialBgTex;
+    else
+        currentBackgroundTexture = aquaticBgTex;
+
+    //bgSprite.setTexture(currentBackgroundTexture);
+
+    //window.draw(bgSprite);
 }

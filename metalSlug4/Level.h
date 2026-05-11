@@ -3,7 +3,7 @@
 
 
 
-//owns the char** tile grid for one level
+
 
 class Level
 {
@@ -11,11 +11,12 @@ class Level
     int    width;     //in tiles (columns)
     int    height;    //in tiles (rows)
     int    cellSize;  //pixels per tile (64)
+    int biomeId;
 
-    // add these members
     sf::Texture aerialBgTex;
     sf::Texture plainsBgTex;
     sf::Texture aquaticBgTex;
+    sf::Texture currentBackgroundTexture;
     sf::Sprite  bgSprite;
 
     sf::Texture grassTex;
@@ -39,10 +40,10 @@ public:
     int getCellSize()    const { return cellSize; }
     int getWidth()       const { return width; }
     int getHeight()      const { return height; }
+    char** getGrid() const { return grid; }
 
-
-    // add this method declaration
     void drawBackground(sf::RenderWindow& window, int camX, int camY, int screenW, int screenH);
+    void setBiome(int biome);
 
     void loadTextures();
 };

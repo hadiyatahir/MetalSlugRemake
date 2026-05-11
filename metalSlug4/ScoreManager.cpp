@@ -1,0 +1,25 @@
+#include "ScoreManager.h"
+
+void ScoreManager::addScore(int points)
+{
+    mScore += points;
+    if (mScore > mHighScore)
+        mHighScore = mScore;
+}
+
+void ScoreManager::resetScore()
+{
+    mScore = 0;
+}
+
+int ScoreManager::getScore()     const { return mScore; }
+int ScoreManager::getHighScore() const { return mHighScore; }
+
+// Massacre: 3+ enemies with one grenade/rocket
+// Formula: 300 base + (n - 3) * 50 for every kill beyond 3
+void ScoreManager::awardMassacre(int killCount)
+{
+    if (killCount < 3) return;
+    int bonus = 300 + (killCount - 3) * 50;
+    addScore(bonus);
+}

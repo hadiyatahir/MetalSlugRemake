@@ -1,70 +1,128 @@
 #include "CharacterSelectState.h"
 #include "PlayState.h"
 
-
 CharacterSelectState::CharacterSelectState()
+    : selectedCharacter(0),
+    mLeftWasPressed(true),
+    mRightWasPressed(true),
+    mEnterWasPressed(true)
 {
-    this->selectedCharacter = 0;
+
 }
 
-void CharacterSelectState::enter() {
-   
-        //font.loadFromFile("Fonts/font.ttf");
-        //menuSprite.setTexture(menuTex);
-        selectTex.loadFromFile("Sprites/Menu/characterbg.jpg");
-        selectSprite.setTexture(selectTex);
+void CharacterSelectState::enter()
+{
+    selectTex.loadFromFile("Sprites/Menu/select.jpg");
+    selectSprite.setTexture(selectTex);
+    selectSprite.setScale(2.5f, 2.5f);
+    selectSprite.setPosition(100.f, 100.f);
 
-        selectSprite.setScale(4.f, 3.9f);
-        selectSprite.setPosition(0.f, 0.f);
+    mFont.loadFromFile("Sprites/Font/metal-slug.ttf");
 
+    mTitleText.setFont(mFont);
+    mTitleText.setString("SELECT PLAYERS");
+    mTitleText.setCharacterSize(52);
+    mTitleText.setFillColor(sf::Color::Yellow);
+    mTitleText.setOutlineColor(sf::Color::Black);
+    mTitleText.setOutlineThickness(3.f);
+    mTitleText.setPosition(460.f, 10.f);
 
-        //p1
-        p1tex.loadFromFile("Sprites/MarcoRossi/pistol/idleRight.png");
-        p1.setTexture(p1tex);
+    mInstructionText.setFont(mFont);
+    mInstructionText.setString("LEFT / RIGHT to change     ENTER to start");
+    mInstructionText.setCharacterSize(20);
+    mInstructionText.setFillColor(sf::Color(200, 200, 200));
+    mInstructionText.setPosition(350.f, 710.f);
 
-        p1.setScale(2.f, 2.f);
-        p1.setPosition(900, 200);
+    const char* names[4] = { "P1", "P2", "P3", "P4" };
+    float startX = 205.f;
+    float spacing = 335.f;
 
+    for (int i = 0; i < 4; i++)
+    {
+        mPlayerText[i].setFont(mFont);
+        mPlayerText[i].setString(names[i]);
+        mPlayerText[i].setOutlineColor(sf::Color::Black);
+        mPlayerText[i].setOutlineThickness(2.f);
+        mPlayerText[i].setPosition(startX + i * spacing, 750.f);
 
-
-        if (menuMusic.openFromFile("Sprites/Audio/audio_menu_bg.ogg"))
+        if (i == selectedCharacter)
         {
-            menuMusic.setLoop(true);
-            menuMusic.setVolume(50.f);
-            menuMusic.play();
+            mPlayerText[i].setFillColor(sf::Color::Yellow);
+            mPlayerText[i].setCharacterSize(102);
         }
+        else
+        {
+            mPlayerText[i].setFillColor(sf::Color(200, 200, 200));
+            mPlayerText[i].setCharacterSize(96);
+        }
+    }
 
-
+    if (menuMusic.openFromFile("Sprites/Audio/audio_character_bg.ogg"))
+    {
+        menuMusic.setLoop(true);
+        menuMusic.setVolume(30.f);
+        menuMusic.play();
+    }
 }
 
-void CharacterSelectState::exit() {
+void CharacterSelectState::exit()
+{
     menuMusic.stop();
 }
 
+void CharacterSelectState::handleInput(sf::RenderWindow& window)
+{
+    bool leftNow = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
+    if (leftNow && !mLeftWasPressed)
+        if (selectedCharacter > 0) selectedCharacter--;
+    mLeftWasPressed = leftNow;
 
-void CharacterSelectState::handleInput(sf::RenderWindow& window) {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter) && !enterPressed) {
-        nextState = new PlayState(1600, 900);
-        isDone = true;
-        enterPressed = true;
-    }
+    bool rightNow = sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
+    if (rightNow && !mRightWasPressed)
+        if (selectedCharacter < 3) selectedCharacter++;
+    mRightWasPressed = rightNow;
 
-    if (Keyboard::isKeyPressed(Keyboard::Escape))
+    bool enterNow = sf::Keyboard::isKeyPressed(sf::Keyboard::Enter);
+    if (enterNow && !mEnterWasPressed)
     {
+        // selectedCharacter is now 0-3 (index), so pass +1 as the player count
+        nextState = new PlayState(1600, 900, 0, selectedCharacter + 1);
+        isDone = true;
+    }
+    mEnterWasPressed = enterNow;
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
         window.close();
+}
+
+void CharacterSelectState::update(float dt)
+{
+    for (int i = 0; i < 4; i++)
+    {
+        if (i == selectedCharacter)
+        {
+            mPlayerText[i].setFillColor(sf::Color::Yellow);
+            mPlayerText[i].setCharacterSize(102);
+        }
+        else
+        {
+            mPlayerText[i].setFillColor(sf::Color(200, 200, 200));
+            mPlayerText[i].setCharacterSize(96);
+        }
     }
 }
 
-void CharacterSelectState::update(float dt) {
-
-}
-
-void CharacterSelectState::draw(sf::RenderWindow& window) {
+void CharacterSelectState::draw(sf::RenderWindow& window)
+{
     window.draw(selectSprite);
-    window.draw(p1);
+    window.draw(mTitleText);
+    window.draw(mInstructionText);
+
+    for (int i = 0; i < 4; i++)
+        window.draw(mPlayerText[i]);
 }
 
-
-int CharacterSelectState::getSelectedCharacter() const { 
-    return selectedCharacter; 
+int CharacterSelectState::getSelectedCharacter() const
+{
+    return selectedCharacter;
 }

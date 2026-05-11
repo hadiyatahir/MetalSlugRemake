@@ -22,7 +22,19 @@ void Animation::setup(const char* animName, IntRect* frames, int frameCount, flo
 {
     //yaar iska banado function strcopy manually 
 
-    strcopy(name, animName, 31);
+    //strcopy(name, animName, 31);
+    //name[31] = '\0';
+
+    int i = 0;
+
+    for (; i < 31; i++)
+    {
+        name[i] = animName[i];
+
+        if (animName[i] == '\0')
+            break;
+    }
+
     name[31] = '\0';
 
     mframeCount = (frameCount > 32) ? 32 : frameCount;
@@ -33,6 +45,9 @@ void Animation::setup(const char* animName, IntRect* frames, int frameCount, flo
     misLooping = looping;
     reset();
 }
+
+
+
 void Animation::play()
 {
     misPlaying = true;

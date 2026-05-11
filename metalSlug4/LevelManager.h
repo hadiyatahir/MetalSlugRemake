@@ -20,7 +20,7 @@
 
 class LevelManager
 {
-    Level* level;       // owned — we new it, we delete it
+    Level* level;       //composition
 
     int camX;           // world pixels scrolled horizontally
     int camY;           // world pixels scrolled vertically
@@ -34,7 +34,7 @@ public:
 
     // Create and populate the level grid
     // Call this once at the start of PlayState
-    void loadLevel();
+    void loadLevel(int biomeId);
 
     // Called every frame with the player's current world position
     // Moves camX/camY to follow the player, clamped to level bounds
