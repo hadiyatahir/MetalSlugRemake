@@ -1,6 +1,6 @@
 A 2D side-scrolling run-and-gun shooter developed in C++ using SFML, inspired by the classic Metal Slug series. This project recreates the core gameplay mechanics of the original game while serving as a demonstration of object-oriented programming, game architecture, AI systems, procedural generation, and software design principles.
 
-#Features
+Features:
 - Multiple playable soldier characters
 - Weapon system with weapon swapping
 - Pistol
@@ -20,7 +20,7 @@ A 2D side-scrolling run-and-gun shooter developed in C++ using SFML, inspired by
 - State pattern implementation for character transformations
 
 
-#Technologies Used
+Technologies Used:
 - C++
 - SFML (Graphics, Audio, Window)
 - Object-Oriented Programming
