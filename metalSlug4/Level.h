@@ -7,10 +7,10 @@
 
 class Level
 {
-    char** grid;      // [row][col] — row = y, col = x
-    int    width;     //in tiles (columns)
-    int    height;    //in tiles (rows)
-    int    cellSize;  //pixels per tile (64)
+    char** grid;    
+    int width;   
+    int height;    
+    int cellSize;  
     int biomeId;
 
     sf::Texture aerialBgTex;
@@ -35,12 +35,33 @@ public:
 
     bool isSolid(float worldX, float worldY) const;   //collision helper function
 
-    int getPixelWidth()  const { return width * cellSize; }
-    int getPixelHeight() const { return height * cellSize; }
-    int getCellSize()    const { return cellSize; }
-    int getWidth()       const { return width; }
-    int getHeight()      const { return height; }
-    char** getGrid() const { return grid; }
+    int getPixelWidth()  const { 
+        return width * cellSize;
+    }
+
+    int getPixelHeight() const {
+        return height * cellSize;
+    }
+
+    int getCellSize() const {
+        return cellSize;
+    }
+
+    int getWidth() const {
+        return width;
+    }
+
+    int getHeight() const {
+        return height;
+    }
+
+    char** getGrid() const {
+        return grid;
+    }
+
+    int getBiome() const { return biomeId; }
+
+    sf::Vector2u getBgSize() const { return currentBackgroundTexture.getSize(); }
 
     void drawBackground(sf::RenderWindow& window, int camX, int camY, int screenW, int screenH);
     void setBiome(int biome);

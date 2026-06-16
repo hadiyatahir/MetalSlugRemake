@@ -50,7 +50,6 @@ class CharacterSelectState : public GameState
     sf::Font       mFont;
     sf::Text       mTitleText;
     sf::Text mPlayerText[4];
-    //sf::Text       mPlayerText;
     sf::Text       mInstructionText;
 
     sf::Music      menuMusic;
@@ -58,7 +57,7 @@ class CharacterSelectState : public GameState
     int currentPlayer;
     int selectedCharacters[4];
 
-    // debounce flags — one per key
+
     bool mLeftWasPressed = false;
     bool mRightWasPressed = false;
     bool mEnterWasPressed = true;
@@ -68,11 +67,11 @@ public:
 
 
 
-    void enter()                           override;
-    void exit()                            override;
+    void enter() override;
+    void exit()  override;
     void handleInput(sf::RenderWindow& w)  override;
-    void update(float dt)                  override;
-    void draw(sf::RenderWindow& window)    override;
+    void update(float dt) override;
+    void draw(sf::RenderWindow& window) override;
 
     int getSelectedCharacter() const;
 };

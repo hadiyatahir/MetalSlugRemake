@@ -87,6 +87,9 @@
 #include <SFML/Graphics.hpp>
 #include "PlayState.h"
 
+
+
+
 MenuState::MenuState()
 {
 
@@ -95,8 +98,17 @@ MenuState::MenuState()
 void MenuState::enter() {
     //font.loadFromFile("Fonts/font.ttf");
     //menuSprite.setTexture(menuTex);
-    menuTex.loadFromFile("Sprites/Menu/menu1.png");
+
+   
+
+    menuTex.loadFromFile("Sprites/Menu/loadingsc.png");
+    titleTex.loadFromFile("Sprites/Menu/title2.png");
+    bgTex.loadFromFile("Sprites/Menu/bg.png");
+
     menuSprite.setTexture(menuTex);
+    titleSprite.setTexture(titleTex);
+    bgSprite.setTexture(bgTex);
+   // menuSprite.setScale();
 
 
     /*titleText.setFont(font);
@@ -111,24 +123,35 @@ void MenuState::enter() {
     promptText.setFillColor(sf::Color::Yellow);
     promptText.setPosition(560.f, 450.f);*/
 
-    menuSprite.setScale(3.2f, 3.2f);
-    menuSprite.setPosition(0.f, 0.f);
-
+    menuSprite.setScale(1.05f, 1.05f);
+    titleSprite.setScale(4.0f, 4.0f);
+    titleSprite.setPosition(200.f, -10.f);
+    menuSprite.setPosition(900.f, 200.f);
+    bgSprite.setPosition(-10.f,-370.f);
+    bgSprite.setScale(1.5f,1.5f);
 
     font.loadFromFile("Sprites/Font/metal-slug.ttf");
-
+    // --- CAMPAIGN TEXT ---
     campaignText.setFont(font);
     campaignText.setString("CAMPAIGN MODE");
-    campaignText.setCharacterSize(20);
-    campaignText.setFillColor(sf::Color::White);
-    campaignText.setPosition(300.f, 690.f);
+    campaignText.setCharacterSize(30);
+    campaignText.setFillColor(sf::Color::Red);
+    campaignText.setPosition(100.f, 700.f);
 
+    // --- SURVIVAL TEXT ---
     survivalText.setFont(font);
     survivalText.setString("SURVIVAL MODE");
-    survivalText.setCharacterSize(20);
-    survivalText.setFillColor(sf::Color::White);
-    //survivalText.setPosition(500.f, 450.f);
-    survivalText.setPosition(300.f, 730.f);
+    survivalText.setCharacterSize(30);
+    survivalText.setFillColor(sf::Color::Red);
+    survivalText.setPosition(100.f, 750.f);
+
+    // --- SCOREBOARD TEXT (Fixed Typo Here) ---
+    scoreText.setFont(font);
+    scoreText.setString("SCOREBOARD"); // Fixed
+    scoreText.setCharacterSize(30);    // Fixed
+    scoreText.setFillColor(sf::Color::Red); // Fixed
+    scoreText.setPosition(100.f, 800.f);
+
 
     if (menuMusic.openFromFile("Sprites/Audio/audio_menu_bg.ogg"))
     {
@@ -169,7 +192,6 @@ void MenuState::handleInput(sf::RenderWindow& window)
 
 
 }*/
-
 void MenuState::handleInput(sf::RenderWindow& window)
 {
     static bool upPrev = false;
@@ -180,18 +202,46 @@ void MenuState::handleInput(sf::RenderWindow& window)
     bool downNow = sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
     bool enterNow = sf::Keyboard::isKeyPressed(sf::Keyboard::Enter);
 
-    if (upNow && !upPrev)
-        selected = 0;
-
-    if (downNow && !downPrev)
-        selected = 1;
-
-    if (enterNow && !enterPrev)
-    {
-        nextState = new CharacterSelectState();
-        isDone = true;
+    // Cycle Upwards
+    if (upNow && !upPrev) {
+        selected--;
+        if (selected < 0) {
+            selected = 2; // Loop back to the bottom option (Scoreboard)
+        }
     }
 
+    // Cycle Downwards
+    if (downNow && !downPrev) {
+        selected++;
+        if (selected > 2) {
+            selected = 0; // Loop back to the top option (Campaign)
+        }
+    }
+
+    // Handle Selection Execution
+    if (enterNow && !enterPrev)
+    {
+        if (selected == 0)
+        {
+            nextState = new CharacterSelectState(); // Or whatever starts your Campaign
+            isDone = true;
+        }
+        else if (selected == 1)
+        {
+            // nextState = new SurvivalState(); // Uncomment when you create this state
+            // isDone = true;
+        }
+        else if (selected == 2)
+        {
+            // nextState = new ScoreboardState(); // Uncomment when you create this state
+            // isDone = true;
+
+            // Temporary debug line to make sure it works:
+            std::cout << "Scoreboard Selected!" << std::endl;
+        }
+    }
+
+    // Save previous button states
     upPrev = upNow;
     downPrev = downNow;
     enterPrev = enterNow;
@@ -210,19 +260,38 @@ void MenuState::draw(sf::RenderWindow& window)
 
 void MenuState::draw(sf::RenderWindow& window)
 {
-    window.draw(menuSprite);
+    window.draw(bgSprite);
+    window.draw(titleSprite);
 
+    // Reset sizes and colors to defaults first
+    campaignText.setFillColor(sf::Color::White);
+    campaignText.setCharacterSize(20);
+
+    survivalText.setFillColor(sf::Color::White);
+    survivalText.setCharacterSize(20);
+
+    scoreText.setFillColor(sf::Color::White);
+    scoreText.setCharacterSize(20);
+
+    // Apply Highlight to the active option
     if (selected == 0)
     {
         campaignText.setFillColor(sf::Color::Yellow);
-        survivalText.setFillColor(sf::Color::White);
+        campaignText.setCharacterSize(22);
     }
-    else
+    else if (selected == 1)
     {
-        campaignText.setFillColor(sf::Color::White);
         survivalText.setFillColor(sf::Color::Yellow);
+        survivalText.setCharacterSize(22);
+    }
+    else if (selected == 2)
+    {
+        scoreText.setFillColor(sf::Color::Yellow);
+        scoreText.setCharacterSize(22);
     }
 
+    // Draw all text items to the window
     window.draw(campaignText);
     window.draw(survivalText);
+    window.draw(scoreText); // Added this so it actually renders!
 }

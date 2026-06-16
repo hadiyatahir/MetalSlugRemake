@@ -11,7 +11,7 @@ void strcopy(char* dest, const char* src, int maxSize)
         i++;
     }
 
-    dest[i] = '\0'; // always null-terminate
+    dest[i] = '\0'; 
 }
 
 Animation::Animation() : mframeCount(0), mframeRate(12.f), mcurrentFrameIndex(0), mtimeAccumulator(0.f), misLooping(true), misPlaying(false), mfinished(false)

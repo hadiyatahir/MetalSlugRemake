@@ -1,4 +1,6 @@
 
+
+
 #include "Soldier.h"
 #include <SFML/Window/Keyboard.hpp>
 #include <cstring>
@@ -10,30 +12,17 @@ static bool isTile(char** lvl, int x, int y, int mapWidth, int mapHeight)
 }
 
 
-//////////////////////////////////SOLDIER////////////////////////////////////////////
-
-
 Soldier::Soldier(float spd, int hp)
     : speed(spd), health(hp),
     mcurrentAnim(IDLE),
     mCurrentWeaponAnim(W_IDLE),
     mWeaponTextureLoaded(false)
 {
-
 }
 
-void Soldier::setPosition(float x, float y) {
-    msprite.setPosition(x, y);
-}
-
-Sprite& Soldier::getSprite() {
-    return msprite;
-}
-
-Sprite& Soldier::getWeaponSprite() { 
-    return mWeaponSprite;
-}
-
+void Soldier::setPosition(float x, float y) { msprite.setPosition(x, y); }
+Sprite& Soldier::getSprite() { return msprite; }
+Sprite& Soldier::getWeaponSprite() { return mWeaponSprite; }
 
 void Soldier::equipWeapon(Weapon* w)
 {
@@ -91,8 +80,8 @@ void Soldier::syncWeaponSprite()
 
 void Soldier::update(float dt, char** lvl, int cell_size, int mapWidth, int mapHeight, int biomeId)
 {
-   /* if (!onGround) { velocityY += gravity; if (velocityY > 20.f) velocityY = 20.f; }
-    else { velocityY = 0.f; }*/
+    /* if (!onGround) { velocityY += gravity; if (velocityY > 20.f) velocityY = 20.f; }
+     else { velocityY = 0.f; }*/
 
     if (biomeId == 2)
     {
@@ -114,140 +103,78 @@ void Soldier::update(float dt, char** lvl, int cell_size, int mapWidth, int mapH
     }
 
 
-
     float bx = msprite.getPosition().x + collisionOffsetX;
     float by = msprite.getPosition().y + collisionOffsetY;
     float bw = collisionWidth, bh = collisionHeight;
 
-    // horizontal movement
+    // ---- MOVE X ----
     msprite.move(velocityX, 0);
     bx = msprite.getPosition().x + collisionOffsetX;
     int L = (int)(bx / cell_size), R = (int)((bx + bw - 1) / cell_size);
     int T = (int)(by / cell_size), B = (int)((by + bh - 1) / cell_size);
-    if (L < 0)L = 0;
-    else if (L >= mapWidth) L = mapWidth - 1;
-    if (R < 0)R = 0;
-    else if (R >= mapWidth) R = mapWidth - 1;
-    if (T < 0)T = 0; 
-    else if (T >= mapHeight)T = mapHeight - 1;
-    if (B < 0)B = 0;
-    else if (B >= mapHeight)B = mapHeight - 1;
-    if (velocityX > 0) { 
-        for (int i = T; i <= B; i++)
-            if (isTile(lvl, R, i, mapWidth, mapHeight)) { 
-                msprite.setPosition(R * cell_size - bw - collisionOffsetX, msprite.getPosition().y); 
-                velocityX = 0; bx = msprite.getPosition().x + collisionOffsetX; break;
-            }
-    }
+    if (L < 0)L = 0; else if (L >= mapWidth) L = mapWidth - 1;
+    if (R < 0)R = 0; else if (R >= mapWidth) R = mapWidth - 1;
+    if (T < 0)T = 0; else if (T >= mapHeight)T = mapHeight - 1;
+    if (B < 0)B = 0; else if (B >= mapHeight)B = mapHeight - 1;
+    if (velocityX > 0) { for (int i = T; i <= B; i++) if (isTile(lvl, R, i, mapWidth, mapHeight)) { msprite.setPosition(R * cell_size - bw - collisionOffsetX, msprite.getPosition().y); velocityX = 0; bx = msprite.getPosition().x + collisionOffsetX; break; } }
+    else if (velocityX < 0) { for (int i = T; i <= B; i++) if (isTile(lvl, L, i, mapWidth, mapHeight)) { msprite.setPosition((L + 1) * cell_size - collisionOffsetX, msprite.getPosition().y); velocityX = 0; bx = msprite.getPosition().x + collisionOffsetX; break; } }
 
-    else if (velocityX < 0) { 
-        for (int i = T; i <= B; i++) 
-            if (isTile(lvl, L, i, mapWidth, mapHeight)) {
-                msprite.setPosition((L + 1) * cell_size - collisionOffsetX, msprite.getPosition().y);
-                velocityX = 0; bx = msprite.getPosition().x + collisionOffsetX; break;
-            }
-    }
-
-    bool aquatic = false; // pass biomeId here properly or store in class
-
-    //vertical movement
-   // msprite.move(0, velocityY);
-
-    if (biomeId != 2)
-    {
-        msprite.move(0, velocityY);
-    }
-    else
-    {
-        msprite.move(0, velocityY);
-        velocityY *= 0.98f; // water drag
-    }
-
-
+    // ---- MOVE Y ----
+    msprite.move(0, velocityY);
     by = msprite.getPosition().y + collisionOffsetY;
     L = (int)(bx / cell_size); R = (int)((bx + bw - 1) / cell_size);
     T = (int)(by / cell_size); B = (int)((by + bh - 1) / cell_size);
-    if (L < 0)L = 0;
-    else if (L >= mapWidth) L = mapWidth - 1;
-    if (R < 0)R = 0;
-    else if (R >= mapWidth) R = mapWidth - 1;
-    if (T < 0)T = 0;
-    else if (T >= mapHeight)T = mapHeight - 1;
-    if (B < 0)B = 0; 
-    else if (B >= mapHeight)B = mapHeight - 1;
-    /*onGround = false;
-    if (velocityY >= 0) {
-        for (int j = L; j <= R; j++) 
-            if (isTile(lvl, j, B, mapWidth, mapHeight)) {
-                msprite.setPosition(msprite.getPosition().x, B * cell_size - bh - collisionOffsetY);
-                velocityY = 0; onGround = true; isJumping = false; by = msprite.getPosition().y + collisionOffsetY; break; 
-            }
-    }
+    if (L < 0)L = 0; else if (L >= mapWidth) L = mapWidth - 1;
+    if (R < 0)R = 0; else if (R >= mapWidth) R = mapWidth - 1;
+    if (T < 0)T = 0; else if (T >= mapHeight)T = mapHeight - 1;
+    if (B < 0)B = 0; else if (B >= mapHeight)B = mapHeight - 1;
+    onGround = false;
+    if (velocityY >= 0) { for (int j = L; j <= R; j++) if (isTile(lvl, j, B, mapWidth, mapHeight)) { msprite.setPosition(msprite.getPosition().x, B * cell_size - bh - collisionOffsetY); velocityY = 0; onGround = true; isJumping = false; by = msprite.getPosition().y + collisionOffsetY; break; } }
+    else { for (int j = L; j <= R; j++) if (isTile(lvl, j, T, mapWidth, mapHeight)) { msprite.setPosition(msprite.getPosition().x, (T + 1) * cell_size - collisionOffsetY); velocityY = 0; isJumping = false; by = msprite.getPosition().y + collisionOffsetY; break; } }
 
-    else { 
-        for (int j = L; j <= R; j++) 
-            if (isTile(lvl, j, T, mapWidth, mapHeight)) {
-                msprite.setPosition(msprite.getPosition().x, (T + 1) * cell_size - collisionOffsetY); 
-                velocityY = 0; isJumping = false;
-                by = msprite.getPosition().y + collisionOffsetY; break;
-            }
-    }*/
-
-    if (biomeId != 2)
-    {
-        onGround = false;
-
-        if (velocityY >= 0) {
-            for (int j = L; j <= R; j++)
-                if (isTile(lvl, j, B, mapWidth, mapHeight)) {
-                    msprite.setPosition(msprite.getPosition().x,
-                        B * cell_size - bh - collisionOffsetY);
-                    velocityY = 0;
-                    onGround = true;
-                    isJumping = false;
-                    break;
-                }
-        }
-        else {
-            for (int j = L; j <= R; j++)
-                if (isTile(lvl, j, T, mapWidth, mapHeight)) {
-                    msprite.setPosition(msprite.getPosition().x,
-                        (T + 1) * cell_size - collisionOffsetY);
-                    velocityY = 0;
-                    isJumping = false;
-                    break;
-                }
-        }
-    }
-
-
-
-
-    //clamping
+    // ---- CLAMP ----
     bx = msprite.getPosition().x + collisionOffsetX;
     by = msprite.getPosition().y + collisionOffsetY;
     float cx = bx, cy = by;
-    if (cx < 0.f) cx = 0.f;
-    else if (cx > mapWidth * cell_size - bw) cx = mapWidth * cell_size - bw;
-    if (cy < 0.f) cy = 0.f;
-    else if (cy > mapHeight * cell_size - bh) { 
-        cy = mapHeight * cell_size - bh; velocityY = 0; 
-        onGround = true;
-        isJumping = false; }
+    if (cx < 0.f) cx = 0.f; else if (cx > mapWidth * cell_size - bw) cx = mapWidth * cell_size - bw;
+    if (cy < 0.f) cy = 0.f; else if (cy > mapHeight * cell_size - bh) { cy = mapHeight * cell_size - bh; velocityY = 0; onGround = true; isJumping = false; }
     msprite.setPosition(cx - collisionOffsetX, cy - collisionOffsetY);
 
-    //animation
-    bool isRunning = (velocityX != 0.f);
-    if (isJumping)
-        setAnimation(isRunning ? JUMP_RUN : JUMP_IDLE);
+    // ---- BODY ANIMATION ----
+  /*  bool isRunning = (velocityX != 0.f);
+    if (isJumping)      setAnimation(isRunning ? JUMP_RUN : JUMP_IDLE);
     else if (isRunning) setAnimation(WALK);
-    else setAnimation(IDLE);
+    else                setAnimation(IDLE);*/
+    // ---- BODY ANIMATION ----
+    bool isRunning = (velocityX != 0.f);
+    bool isMeleePlaying = (mcurrentAnim == MELEE && !manimations[MELEE].isFinished());
+
+    if (!isMeleePlaying)
+    {
+
+        if (biomeId == 2)                                    // ← ADD THIS
+        {
+            if (mIsShooting)    setAnimation(SWIM_SHOOT);
+            else if (isRunning) setAnimation(SWIM);
+            else                setAnimation(SWIM_IDLE);
+        }
+        else                                                 // existing land logic
+        {
+            if (isJumping)      setAnimation(isRunning ? JUMP_RUN : JUMP_IDLE);
+            else if (isRunning) setAnimation(WALK);
+            else                setAnimation(IDLE);
+        }
+        /*
+        if (isJumping)      setAnimation(isRunning ? JUMP_RUN : JUMP_IDLE);
+        else if (isRunning) setAnimation(WALK);
+        else                setAnimation(IDLE);*/
+    }
+
     manimations[mcurrentAnim].update(dt);
     msprite.setTextureRect(manimations[mcurrentAnim].getCurrentFrame());
     msprite.setScale(facingRight ? baseScale : -baseScale, baseScale);
 
 
-    //weapon animtion
     if (mWeaponTextureLoaded)
     {
         bool airborne = isJumping && !onGround;
@@ -316,26 +243,29 @@ void Soldier::update(float dt, char** lvl, int cell_size, int mapWidth, int mapH
     if (m_weapon) m_weapon->update(dt);
 }
 
-// ================================================================
-//  PLAYER SOLDIER
-// ================================================================
+
 PlayerSoldier::PlayerSoldier(int index) : Soldier(3.f, 100), mplayerIndex(index), mWeaponSlot(0)
 {
+    mTransformState = new NormalState();
     loadPlayerData();
     setAnimation(IDLE);
     equipWeapon(new Pistol(mAmmoTex));
-    isImmortal = false;
 
     devFont.loadFromFile("Sprites/Font/metal-slug.ttf");
 
     devText.setFont(devFont);
     devText.setCharacterSize(24);
-    devText.setFillColor(sf::Color::Yellow);
     devText.setString("DEVELOPER MODE");
-    devText.setPosition(1200.f, 15.f);
-    devMusic.openFromFile("Sprites/Audio/audio_character_bg.ogg");
-    devMusic.setLoop(true);
-    devMusic.setVolume(10.f);
+    devText.setFillColor(sf::Color::Yellow);
+    devText.setPosition(1200.f, 20.f);
+}
+
+void PlayerSoldier::drawDevMode(sf::RenderWindow& window)
+{
+    if (isImmortal)
+    {
+        window.draw(devText);
+    }
 }
 
 
@@ -344,10 +274,43 @@ void PlayerSoldier::update(float dt, char** lvl, int cell_size, int mapWidth, in
     mMapWidth = mapWidth;
     mCellSize = cell_size;
 
-    if (mDamageTimer > 0.f)
-        mDamageTimer -= dt;   // just tick down, nothing else
+    if (mTransformState)
+        mTransformState->update(dt, *this);
 
-    handleInput(dt, biomeId);
+    if (mDamageTimer > 0.f)
+        mDamageTimer -= dt;   
+
+    if (mTransformTimer > 0.f)
+    {
+        mTransformTimer -= dt;
+        if (mTransformTimer <= 0.f)
+        {
+            mTransformTimer = 0.f;
+            restoreNormalForm();
+        }
+    }
+
+    if (mplayerIndex == 0)   // only player 0 has the swim sheet
+    {
+        if (biomeId == 2 && !inwater)
+        {
+            inwater = true;
+            setupPlayer3SwimAnimations();      // load rects once
+            msprite.setTexture(mswim);         // swap texture once
+            baseScale = mSwimScale;            // set scale once
+            setAnimation(SWIM_IDLE);           // start anim once
+        }
+        else if (biomeId != 2 && inwater)
+        {
+            inwater = false;
+            msprite.setTexture(mtexture);      // restore land texture
+            setupPlayer3Animations();          // restore land rects
+            baseScale = 1.45f;                 // restore land scale
+            setAnimation(IDLE);
+        }
+    }
+
+    handleInput(dt);
     Soldier::update(dt, lvl, cell_size, mapWidth, mapHeight, biomeId);
 }
 /*
@@ -384,101 +347,118 @@ void PlayerSoldier::takeDamage()
     Soldier::update(dt, lvl, cell_size, mapWidth, mapHeight, biomeId);
 }*/
 
-// ================================================================
-//  LOAD PROJECTILE TEXTURES
-//  Called once in loadPlayerData() so RocketLauncher / HandGrenade
-//  always have a valid Texture& when constructed via equipWeapon().
-// ================================================================
+
 void PlayerSoldier::loadProjectileTextures()
 {
     mAmmoTex.loadFromFile("Sprites/ammo.png");
-    mGrenadeTex.loadFromFile("Sprites/grenade.png");
+    //mGrenadeTex.loadFromFile("Sprites/grenade.png");
 }
 
-// ================================================================
-//  INPUT
-// ================================================================
 
-void PlayerSoldier::handleInput(float dt, int biomeId)
+
+void PlayerSoldier::handleInput(float dt)
 {
     velocityX = 0;
     mIsShooting = false;
 
-    // Only the active (currently controlled) player reads input
+
+
+    static bool prev = false;
+
+    bool current = Keyboard::isKeyPressed(Keyboard::F1);
+
+    if (current && !prev)
+    {
+        isImmortal = !isImmortal;
+    }
+
+    prev = current;
+
+
+
+   
     if (!mIsActive) return;
 
     bool fireKey = false;
     bool cycleKey = false;
+    bool rawFireKey = false;
 
-
-    //FOR DEVELOPER MODE
-    static bool prevF1 = false;
-    static bool musicStarted = false;
-
-    bool f1 = sf::Keyboard::isKeyPressed(sf::Keyboard::F1);
-
-    if (f1 && !prevF1 && (biomeId==0 || biomeId==1 || biomeId==2))
-    {
-        isImmortal = !isImmortal;
-
-        if (isImmortal)
-        {
-            if (!musicStarted)
-            {
-                devMusic.play();
-                musicStarted = true;
-            }
-        }
-        else
-        {
-            devMusic.stop();
-            musicStarted = false;
-        }
-
-
-    }
-
-    prevF1 = f1;
-
-   /* if (devMusic.openFromFile("Sprites/Audio/audio_devMode_bg.ogg") && sf::Keyboard::isKeyPressed(sf::Keyboard::F1))
-    {
-        devMusic.setLoop(true);
-        devMusic.setVolume(30.f);
-        devMusic.play();
-    }*/
-
-
-    if (biomeId == 2)
-    {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-            velocityY = -speed;
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-            velocityY = speed;
-    }
-
-
-    // --- Shared keybindings for all players ---
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) { velocityX = speed; facingRight = true; }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) { velocityX = -speed; facingRight = false; }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && onGround)
+   /* if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && onGround)
     {
         velocityY = jumpStrength;
         onGround = false;
         isJumping = true;
+    }*/
+
+    // REPLACE WITH:
+    if (inwater)   // biome 2 — free swimming in all directions
+    {
+        velocityY = 0.f;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+            velocityY = -speed;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+            velocityY = speed;
     }
 
-    fireKey = sf::Keyboard::isKeyPressed(sf::Keyboard::A);  // fire
+    else
+    {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && onGround)
+        {
+            velocityY = jumpStrength;
+            onGround = false;
+            isJumping = true;
+        }
+    }
+
+
+    // Aim up/down with Z and X keys (or whatever you prefer)
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+        aimAngle += 90.f * dt;   // hold R to aim upward
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
+        aimAngle -= 90.f * dt;   // hold F to aim back down
+
+    // clamp between 0 and 90 degrees only
+    if (aimAngle < 0.f)  aimAngle = 0.f;
+    if (aimAngle > 90.f) aimAngle = 90.f;
+
+
+
+    rawFireKey = sf::Keyboard::isKeyPressed(sf::Keyboard::A);  
+    fireKey = rawFireKey;                                    
+    //  fireKey = sf::Keyboard::isKeyPressed(sf::Keyboard::A);  // fire
     cycleKey = sf::Keyboard::isKeyPressed(sf::Keyboard::X);  // cycle weapon
 
-    // ---- CYCLE WEAPON (one step per press) ----
+    float currentSpeed = speed * mTransformState->getSpeedMultiplier();
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) { velocityX = currentSpeed; facingRight = true; }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) { velocityX = -currentSpeed; facingRight = false; }
+
+    if (!mTransformState->canCycleWeapon()) cycleKey = false;
+
+    if (!mTransformState->canShoot())       fireKey = false;
+
+    if (inwater) cycleKey = false;
+
+    //  if (mTransformState->hasMelee() && fireKey && !mPrevFireKey)
+  //        setAnimation(MELEE);
+
+    if (mTransformState->hasMelee() && rawFireKey && !mPrevFireKey)
+    {
+        // force restart melee regardless of guard
+        mcurrentAnim = MELEE;
+        manimations[MELEE].reset();
+        manimations[MELEE].play();
+    }
+
+   
     if (cycleKey && !mPrevCycleKey)
     {
         mWeaponSlot = (mWeaponSlot + 1) % 6;
         switch (mWeaponSlot)
         {
         case 0: equipWeapon(new Pistol(mAmmoTex)); break;
-        //case 0: equipWeapon(new Pistol());                  break;
+            //case 0: equipWeapon(new Pistol());                  break;
         case 1: equipWeapon(new HeavyMachineGun(mAmmoTex)); break;
         case 2: equipWeapon(new FlameShot(mAmmoTex));       break;
         case 3: equipWeapon(new LaserGun(mAmmoTex));        break;
@@ -492,34 +472,27 @@ void PlayerSoldier::handleInput(float dt, int biomeId)
         }
     }
     mPrevCycleKey = cycleKey;
+    //mPrevFireKey = fireKey;
+    mPrevFireKey = rawFireKey;
 
     // ---- FIRE ----
     if (fireKey && m_weapon)
     {
         mIsShooting = true;
-        float ox = msprite.getPosition().x + (facingRight ? collisionWidth : 0.f);
-        float oy = msprite.getPosition().y + collisionHeight * 0.4f;
+        float ox = msprite.getPosition().x + (facingRight ? collisionWidth + 20.f : -20.f);
+        // float ox = msprite.getPosition().x + (facingRight ? collisionWidth : 0.f);
+        float oy = msprite.getPosition().y + collisionHeight * 0.4f - 5.f;
 
         if (strcmp(m_weapon->getName(), "laserbeam") == 0)
             static_cast<LaserGun*>(m_weapon)->setMapWidth((float)(mMapWidth * mCellSize));
 
-        m_weapon->fire(ox, oy, facingRight, 0.f);
+        m_weapon->fire(ox, oy, facingRight, aimAngle);
     }
 
     if (!fireKey && m_weapon && strcmp(m_weapon->getName(), "flameshot") == 0)
         static_cast<FlameShot*>(m_weapon)->stopFire();
 }
 
-
-
-//simply for drawing text while dev mode i sopen
-void PlayerSoldier::drawDevMode(sf::RenderWindow& window)
-{
-    if (isImmortal)
-    {
-        window.draw(devText);
-    }
-}
 /*void PlayerSoldier::handleInput(float dt)
 {
     velocityX = 0;
@@ -574,81 +547,94 @@ void PlayerSoldier::drawDevMode(sf::RenderWindow& window)
             mCurrentWeaponAnim = W_NONE;
             mWeaponSprite = sf::Sprite();
         }*/
-    /*
-    mPrevCycleKey = cycleKey;
+        /*
+        mPrevCycleKey = cycleKey;
 
-    // ---- FIRE / ATTACK ----
-    // mIsShooting is read by Soldier::update() to select the correct weapon anim.
-    if (fireKey && m_weapon)
-    {
-        mIsShooting = true;
-        float ox = msprite.getPosition().x + (facingRight ? collisionWidth : 0.f);
-        float oy = msprite.getPosition().y + collisionHeight * 0.4f;
+        // ---- FIRE / ATTACK ----
+        // mIsShooting is read by Soldier::update() to select the correct weapon anim.
+        if (fireKey && m_weapon)
+        {
+            mIsShooting = true;
+            float ox = msprite.getPosition().x + (facingRight ? collisionWidth : 0.f);
+            float oy = msprite.getPosition().y + collisionHeight * 0.4f;
 
-        // give laser the map size so it can tile to the edge
-        if (strcmp(m_weapon->getName(), "laserbeam") == 0)
-            static_cast<LaserGun*>(m_weapon)->setMapWidth((float)(mMapWidth * mCellSize));
+            // give laser the map size so it can tile to the edge
+            if (strcmp(m_weapon->getName(), "laserbeam") == 0)
+                static_cast<LaserGun*>(m_weapon)->setMapWidth((float)(mMapWidth * mCellSize));
 
-        m_weapon->fire(ox, oy, facingRight, 0.f);
-    }
+            m_weapon->fire(ox, oy, facingRight, 0.f);
+        }
 
-    // reset flame when key released
-    if (!fireKey && m_weapon && strcmp(m_weapon->getName(), "flameshot") == 0)
-        static_cast<FlameShot*>(m_weapon)->stopFire();
-    // Weapon animation selection is intentionally NOT here.
-    // Soldier::update() handles it in one place alongside the body animation.
-}*/
+        // reset flame when key released
+        if (!fireKey && m_weapon && strcmp(m_weapon->getName(), "flameshot") == 0)
+            static_cast<FlameShot*>(m_weapon)->stopFire();
+        // Weapon animation selection is intentionally NOT here.
+        // Soldier::update() handles it in one place alongside the body animation.
+    }*/
 
-// ================================================================
-//  LOAD PLAYER DATA  (body texture + base animations)
-// ================================================================
 void PlayerSoldier::loadPlayerData()
 {
     if (mplayerIndex == 0)
     {
-        mtexture.loadFromFile("Sprites/Group 10.png");
-        setupPlayer4Animations();
-        baseScale = 2.5f;
-        mWeaponScale = 1.5f;
+
+        mtexture.loadFromFile("Sprites/Group 99.png");
+        setupPlayer3Animations();
+        mswim.loadFromFile("Sprites/Group 39.png");
+        baseScale = 1.45f;
+        mWeaponScale = 1.35f;
+
     }
     else if (mplayerIndex == 1)
     {
         mtexture.loadFromFile("Sprites/Group 8.png");
         setupPlayer2Animations();
-        baseScale = 1.65f;
-        mWeaponScale = 1.65f;
+        baseScale = 1.85f;
+        mWeaponScale = 1.35f;
     }
     else if (mplayerIndex == 2)
     {
         mtexture.loadFromFile("Sprites/Group 5.png");
         setupPlayer1Animations();
-        baseScale = 1.f;
-        mWeaponScale = 1.f;
+        baseScale = 1.15f;
+        mWeaponScale = 1.35f;
     }
     else if (mplayerIndex == 3)
     {
-        mtexture.loadFromFile("Sprites/Group 9.png");
-        setupPlayer3Animations();
-        baseScale = 1.25f;
-        mWeaponScale = 1.25f;
+        mtexture.loadFromFile("Sprites/Group 10.png");
+        setupPlayer4Animations();
+        baseScale = 2.75f;
+        mWeaponScale = 1.35f;
     }
     msprite.setTexture(mtexture);
     loadProjectileTextures();   // always load so weapon swap never has a dangling ref
 }
 
-// ================================================================
-//  EQUIP WEAPON  — swap weapon + reload matching overlay sheet
-// ================================================================
+
 void PlayerSoldier::equipWeapon(Weapon* w)
 {
+
+    mWeaponSprite = sf::Sprite();
+    mWeaponTextureLoaded = false;
+    mCurrentWeaponAnim = W_NONE;
+
     Soldier::equipWeapon(w);
 
     if (!m_weapon)
     {
-        mWeaponTextureLoaded = false;
         mCurrentWeaponAnim = static_cast<WeaponAnimType>(-1);
         return;
     }
+
+   // const char* name = m_weapon->getName();
+
+  //  Soldier::equipWeapon(w);
+
+   // if (!m_weapon)
+    //{
+      //  mWeaponTextureLoaded = false;
+        //mCurrentWeaponAnim = static_cast<WeaponAnimType>(-1);
+        //return;
+    //}
     /*Soldier::equipWeapon(w);
     if (!m_weapon) return;*/
 
@@ -734,9 +720,9 @@ void PlayerSoldier::takeDamage()
 
 void PlayerSoldier::takeDamage()
 {
-
-    if (isImmortal)  //for dev mode
+    if (isImmortal)
         return;
+
 
     if (mDamageTimer > 0.f) return;   // invincibility window
 
@@ -769,9 +755,39 @@ void PlayerSoldier::respawn()
     setPosition(600.f, 500.f);   // your spawn point
 }
 
+void PlayerSoldier::setupPlayer3SwimAnimations()
+{
+    // Replace these rects with your actual sprite sheet coords
+    IntRect swimIdle[5] = {
+        IntRect(207,33,486,390),
+        IntRect(892,26,474,382),
+        IntRect(1478,52,465,385),
+        IntRect(2086,69,466,402),
+        IntRect(2686,100,466,390)
+    };
+    IntRect swim[8] = {
+        IntRect(110,1153,641,309),
+        IntRect(886,1153,626,319),
+        IntRect(1675,1165,622,336),
+        IntRect(2497,1183,600,341),
+        IntRect(3266,1188,619,366),
+        IntRect(4073,1173,615,351),
+        IntRect(4886,1156,629,315),
+        IntRect(5616,1140,607,311)
+    };
+    IntRect swimShoot[6] = {
+        IntRect(5616,1140,607,311),
+        IntRect(848,584,613,372),
+        IntRect(1568,600,642,345),
+        IntRect(2366,600,490,345),
+        IntRect(3166,601,493,343),
+        IntRect(3847,581,494,364)
+    };
 
-
-///////////////////////BOODY ANIMATIONS////////////////////////////////////////
+    manimations[SWIM_IDLE].setup("swim_idle", swimIdle, 5, 6.f, true);
+    manimations[SWIM].setup("swim", swim, 8, 9.f, true);
+    manimations[SWIM_SHOOT].setup("swim_shoot", swimShoot, 6, 8.f, false);
+}
 
 void PlayerSoldier::setupPlayer1Animations()
 {
@@ -782,8 +798,8 @@ void PlayerSoldier::setupPlayer1Animations()
     IntRect swimIdle[6] = { IntRect(22,803,136,77), IntRect(165,801,139,75), IntRect(312,812,137,67), IntRect(457,812,140,64), IntRect(598,810,141,64), IntRect(758,808,140,64) };
     IntRect swim[10] = { IntRect(34,916,132,74), IntRect(176,911,130,67), IntRect(314,916,133,61), IntRect(456,906,139,64), IntRect(600,908,138,61), IntRect(756,905,140,60), IntRect(898,900,138,66), IntRect(1054,895,136,66), IntRect(1196,889,130,77), IntRect(1337,890,131,76) };
     IntRect die[21] = { IntRect(78,687,72,93), IntRect(155,694,79,86), IntRect(239,694,83,86), IntRect(328,692,68,88), IntRect(399,685,69,95), IntRect(471,682,74,98), IntRect(548,680,71,100), IntRect(622,680,68,100), IntRect(696,680,61,100), IntRect(761,687,66,93), IntRect(832,690,67,90), IntRect(902,694,71,86), IntRect(976,706,78,74), IntRect(1057,704,74,76), IntRect(1136,706,69,74), IntRect(1208,709,66,71), IntRect(1277,713,69,67), IntRect(1351,718,69,62), IntRect(1426,728,71,52), IntRect(1500,742,88,38), IntRect(1588,740,84,40) };
-    manimations[IDLE].setup("idle", idle, 4, 6.f, true);
-    manimations[WALK].setup("walk", walk, 12, 20.f, true);
+    manimations[IDLE].setup("idle", idle, 4, 4.f, true);
+    manimations[WALK].setup("walk", walk, 12, 12.f, true);
     manimations[SWIM_IDLE].setup("swim_idle", swimIdle, 6, 8.f, false);
     manimations[SWIM].setup("swim", swim, 10, 8.f, false);
     manimations[JUMP_IDLE].setup("jump_idle", jumpIdle, 6, 6.f, false);
@@ -799,7 +815,7 @@ void PlayerSoldier::setupPlayer2Animations()
     IntRect jumpRun[6] = { IntRect(329,170,48,66), IntRect(382,170,48,63), IntRect(436,170,55,60), IntRect(496,169,49,58), IntRect(549,169,49,58), IntRect(607,169,43,60) };
     IntRect die[19] = { IntRect(4,253,43,60), IntRect(58,256,49,55), IntRect(113,257,47,56), IntRect(169,256,46,57), IntRect(226,254,48,56), IntRect(283,260,42,50), IntRect(332,260,44,50), IntRect(389,263,47,48), IntRect(446,268,53,43), IntRect(510,266,56,42), IntRect(572,271,50,34), IntRect(631,265,48,40), IntRect(687,265,40,42), IntRect(736,260,37,48), IntRect(778,265,39,45), IntRect(826,268,43,45), IntRect(874,278,48,35), IntRect(927,284,53,29), IntRect(985,289,57,24) };
     manimations[IDLE].setup("idle", idle, 4, 6.f, true);
-    manimations[WALK].setup("walk", walk, 6, 15.f, true);
+    manimations[WALK].setup("walk", walk, 6, 6.f, true);
     manimations[JUMP_IDLE].setup("jump_idle", jumpIdle, 6, 6.f, false);
     manimations[JUMP_RUN].setup("jump_run", jumpRun, 6, 6.f, false);
     manimations[DIE].setup("die", die, 19, 5.f, false);
@@ -808,12 +824,12 @@ void PlayerSoldier::setupPlayer2Animations()
 void PlayerSoldier::setupPlayer3Animations()
 {
     IntRect idle[4] = { IntRect(0,1,63,75), IntRect(68,1,61,75), IntRect(136,1,63,75), IntRect(206,1,66,75) };
-    IntRect walk[6] = { IntRect(0,82,67,85), IntRect(67,82,67,85), IntRect(135,82,63,85), IntRect(195,82,63,67), IntRect(262,82,64,84), IntRect(326,82,67,83) };
+    IntRect walk[6] = { IntRect(0,82,65,85), IntRect(67,82,67,85), IntRect(135,82,61,85), IntRect(195,82,64,85), IntRect(262,82,64,84), IntRect(326,82,67,83) };
     IntRect jumpIdle[6] = { IntRect(7,170,60,99), IntRect(75,172,60,98), IntRect(145,175,60,91), IntRect(213,175,60,87), IntRect(281,175,60,77), IntRect(349,175,60,78) };
     IntRect jumpRun[6] = { IntRect(1,272,61,94), IntRect(71,272,63,87), IntRect(143,272,73,78), IntRect(237,272,66,73), IntRect(310,272,68,75), IntRect(393,272,57,81) };
     IntRect die[19] = { IntRect(4,253,43,60), IntRect(58,256,49,55), IntRect(113,257,47,56), IntRect(169,256,46,57), IntRect(226,254,48,56), IntRect(283,260,42,50), IntRect(332,260,44,50), IntRect(389,263,47,48), IntRect(446,268,53,43), IntRect(510,266,56,42), IntRect(572,271,50,34), IntRect(631,265,48,40), IntRect(687,265,40,42), IntRect(736,260,37,48), IntRect(778,265,39,45), IntRect(826,268,43,45), IntRect(874,278,48,35), IntRect(927,284,53,29), IntRect(985,289,57,24) };
     manimations[IDLE].setup("idle", idle, 4, 6.f, true);
-    manimations[WALK].setup("walk", walk, 6, 15.f, true);
+    manimations[WALK].setup("walk", walk, 6, 6.f, true);
     manimations[JUMP_IDLE].setup("jump_idle", jumpIdle, 6, 6.f, false);
     manimations[JUMP_RUN].setup("jump_run", jumpRun, 6, 6.f, false);
     manimations[DIE].setup("die", die, 19, 5.f, false);
@@ -822,12 +838,12 @@ void PlayerSoldier::setupPlayer3Animations()
 void PlayerSoldier::setupPlayer4Animations()
 {
     IntRect idle[4] = { IntRect(4,0,31,37), IntRect(37,0,31,38), IntRect(70,0,31,38), IntRect(103,0,31,38) };
-    IntRect walk[14] = { IntRect(0,54,32,39), IntRect(32,54,32,39), IntRect(65,56,31,35), IntRect(96,55,32,37), IntRect(132,54,28,38), IntRect(164,54,29,39), IntRect(196,55,30,38), IntRect(227,56,33,39), IntRect(260,56,33,39), IntRect(293,56,33,39), IntRect(328,55,29,38), IntRect(359,55,30,38), IntRect(164,54,29,39), IntRect(196,55,30,38) };
+    IntRect walk[14] = { IntRect(0,54,31,39), IntRect(32,54,30,39), IntRect(65,56,29,35), IntRect(96,55,29,37), IntRect(132,54,27,38), IntRect(164,54,27,39), IntRect(196,55,29,38), IntRect(227,56,33,39), IntRect(260,56,31,39), IntRect(293,56,31,39), IntRect(328,55,27,38), IntRect(359,55,29,38), IntRect(164,54,28,39), IntRect(196,55,29,38) };
     IntRect jumpIdle[6] = { IntRect(6,105,29,45), IntRect(40,107,30,43), IntRect(75,109,30,40), IntRect(110,109,30,39), IntRect(145,109,29,37), IntRect(178,109,29,35) };
     IntRect jumpRun[6] = { IntRect(9,163,29,43), IntRect(38,163,29,43), IntRect(71,163,34,32), IntRect(106,163,30,35), IntRect(138,163,30,36), IntRect(168,163,26,37) };
     IntRect die[19] = { IntRect(4,253,43,60), IntRect(58,256,49,55), IntRect(113,257,47,56), IntRect(169,256,46,57), IntRect(226,254,48,56), IntRect(283,260,42,50), IntRect(332,260,44,50), IntRect(389,263,47,48), IntRect(446,268,53,43), IntRect(510,266,56,42), IntRect(572,271,50,34), IntRect(631,265,48,40), IntRect(687,265,40,42), IntRect(736,260,37,48), IntRect(778,265,39,45), IntRect(826,268,43,45), IntRect(874,278,48,35), IntRect(927,284,53,29), IntRect(985,289,57,24) };
     manimations[IDLE].setup("idle", idle, 4, 6.f, true);
-    manimations[WALK].setup("walk", walk, 14, 20.f, true);
+    manimations[WALK].setup("walk", walk, 14, 14.f, true);
     manimations[JUMP_IDLE].setup("jump_idle", jumpIdle, 6, 6.f, false);
     manimations[JUMP_RUN].setup("jump_run", jumpRun, 6, 6.f, false);
     manimations[DIE].setup("die", die, 19, 5.f, false);
@@ -842,7 +858,7 @@ void PlayerSoldier::setupPlayer1Pistol()
     IntRect wMelee[6] = { IntRect(31,135,54,84), IntRect(89,135,52,84), IntRect(145,135,58,86), IntRect(207,137,88,82), IntRect(299,128,102,89), IntRect(403,128,104,89) };
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 4, 12.f, false);
     mWeaponAnims[W_MELEE].setup("w_melee", wMelee, 6, 15.f, false);
-    mWeaponTextureLoaded = true;
+    mWeaponTextureLoaded = false;
 }
 void PlayerSoldier::setupPlayer1HMG()
 {
@@ -859,52 +875,46 @@ void PlayerSoldier::setupPlayer1HMG()
     mWeaponAnims[W_MELEE].setup("w_melee", wMelee, 6, 15.f, false);
     mWeaponTextureLoaded = true;
 }
-
-
 void PlayerSoldier::setupPlayer1Flameshot()
 {
     if (!mWeaponTexture.loadFromFile("Sprites/Group 24.png")) return;
     IntRect wIdle[4] = { IntRect(15,767,83,84), IntRect(99,767,83,86), IntRect(185,767,83,86), IntRect(271,767,85,84) };
-    IntRect wWalk[6] = { IntRect(19,877,90,91), IntRect(113,875,85,91), IntRect(201,875,83,92), IntRect(286,887,88,92), IntRect(374,887,88,92), IntRect(467,877,90,90) };
+    IntRect wWalk[6] = { IntRect(19,877,90,91), IntRect(113,875,85,91), IntRect(201,875,83,92), IntRect(286,877,84,92), IntRect(374,877,84,92), IntRect(467,877,90,90) };
     IntRect wJump[6] = { IntRect(19,985,90,99), IntRect(113,983,87,99), IntRect(201,983,83,101), IntRect(287,985,84,95), IntRect(375,985,88,89), IntRect(467,985,91,84) };
     IntRect wShootI[4] = { IntRect(19,1096,85,79), IntRect(105,1098,83,77), IntRect(189,1096,81,79), IntRect(271,1096,83,79) };
     IntRect wMelee[6] = { IntRect(31,135,54,84), IntRect(89,135,52,84), IntRect(145,135,58,86), IntRect(207,137,88,82), IntRect(299,128,102,89), IntRect(403,128,104,89) };
     mWeaponAnims[W_IDLE].setup("w_idle", wIdle, 4, 6.f, true);
-    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 20.f, true);
+    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 6.f, true);
     mWeaponAnims[W_JUMP].setup("w_jump", wJump, 6, 6.f, false);
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 4, 20.f, true);
     mWeaponAnims[W_MELEE].setup("w_melee", wMelee, 6, 15.f, false);
     mWeaponTextureLoaded = true;
 }
-
-
 void PlayerSoldier::setupPlayer1Laser()
 {
     if (!mWeaponTexture.loadFromFile("Sprites/Group 24.png")) return;
     IntRect wIdle[4] = { IntRect(21,1201,83,86), IntRect(104,1201,83,86), IntRect(191,1201,84,86), IntRect(277,1201,82,84) };
-    IntRect wWalk[6] = { IntRect(25,1311,90,91), IntRect(119,1309,84,91), IntRect(207,1309,82,92), IntRect(292,1311,88,92), IntRect(380,1311,88,92), IntRect(473,1311,90,90) };
+    IntRect wWalk[6] = { IntRect(25,1311,89,91), IntRect(119,1309,82,91), IntRect(207,1309,80,92), IntRect(290,1311,85,92), IntRect(375,1311,85,92), IntRect(470,1311,85,90) };
     IntRect wJump[6] = { IntRect(25,1419,90,99), IntRect(119,1417,84,99), IntRect(207,1417,82,101), IntRect(293,1419,84,95), IntRect(381,1419,88,89), IntRect(473,1419,90,84) };
     IntRect wShootI[4] = { IntRect(25,1530,84,80), IntRect(111,1532,80,78), IntRect(195,1530,78,80), IntRect(277,1530,85,80) };
     IntRect wMelee[6] = { IntRect(31,135,54,84), IntRect(89,135,52,84), IntRect(145,135,58,86), IntRect(207,137,88,82), IntRect(299,128,102,89), IntRect(403,128,104,89) };
     mWeaponAnims[W_IDLE].setup("w_idle", wIdle, 4, 6.f, true);
-    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 20.f, true);
+    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 6.f, true);
     mWeaponAnims[W_JUMP].setup("w_jump", wJump, 4, 6.f, false);
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 4, 12.f, false);
     mWeaponAnims[W_MELEE].setup("w_melee", wMelee, 6, 15.f, false);
     mWeaponTextureLoaded = true;
 }
-
-
 void PlayerSoldier::setupPlayer1RL()
 {
     if (!mWeaponTexture.loadFromFile("Sprites/Group 24.png")) return;
     IntRect wIdle[4] = { IntRect(24,1641,83,84), IntRect(110,1641,83,86), IntRect(197,1641,82,86), IntRect(282,1641,84,84) };
-    IntRect wWalk[6] = { IntRect(31,1751,90,91), IntRect(125,1749,84,91), IntRect(212,1749,83,92), IntRect(296,1751,89,92), IntRect(385,1751,89,92), IntRect(479,1751,90,90) };
+    IntRect wWalk[6] = { IntRect(31,1751,90,91), IntRect(125,1749,84,91), IntRect(212,1749,83,92), IntRect(296,1751,85,92), IntRect(385,1751,86,92), IntRect(479,1751,90,90) };
     IntRect wJump[6] = { IntRect(31,1859,90,99), IntRect(125,1857,84,99), IntRect(213,1857,82,101), IntRect(296,1859,87,95), IntRect(387,1859,88,89), IntRect(479,1859,92,84) };
     IntRect wShootI[4] = { IntRect(30,1970,83,80), IntRect(116,1972,81,78), IntRect(200,1970,79,80), IntRect(283,1970,85,80) };
     IntRect wMelee[6] = { IntRect(31,135,54,84), IntRect(89,135,52,84), IntRect(145,135,58,86), IntRect(207,137,88,82), IntRect(299,128,102,89), IntRect(403,128,104,89) };
     mWeaponAnims[W_IDLE].setup("w_idle", wIdle, 4, 6.f, true);
-    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 20.f, true);
+    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 6.f, true);
     mWeaponAnims[W_JUMP].setup("w_jump", wJump, 4, 6.f, false);
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 4, 4.f, false);
     mWeaponAnims[W_MELEE].setup("w_melee", wMelee, 6, 15.f, false);
@@ -913,12 +923,12 @@ void PlayerSoldier::setupPlayer1RL()
 
 void PlayerSoldier::setupPlayer2Pistol()
 {
-    if (!mWeaponTexture.loadFromFile("Sprites/Group 27.png")) return;
+    if (mWeaponTexture.loadFromFile("Sprites/Group 27.png")) return;
     IntRect wShootI[9] = { IntRect(35,9,106,81), IntRect(147,11,108,79), IntRect(259,9,110,81), IntRect(373,7,80,83), IntRect(457,3,80,87), IntRect(541,3,80,85), IntRect(624,7,81,79), IntRect(707,7,74,81), IntRect(861,5,70,81) };
     IntRect wMelee[6] = { IntRect(29,115,54,83), IntRect(95,115,52,85), IntRect(157,115,58,85), IntRect(227,115,88,83), IntRect(325,107,102,91), IntRect(437,107,102,91) };
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 4, 12.f, false);
-    mWeaponAnims[W_MELEE].setup("w_melee", wMelee, 6, 15.f, false);
-    mWeaponTextureLoaded = true;
+    mWeaponAnims[W_MELEE].setup("w_melee", wMelee, 6, 6.f, false);
+    mWeaponTextureLoaded = false;
 }
 void PlayerSoldier::setupPlayer2HMG()
 {
@@ -929,7 +939,7 @@ void PlayerSoldier::setupPlayer2HMG()
     IntRect wShootI[4] = { IntRect(40,628,133,80), IntRect(180,628,135,82), IntRect(322,628,133,82), IntRect(466,630,137,80) };
     IntRect wMelee[6] = { IntRect(29,115,54,83), IntRect(95,115,52,85), IntRect(157,115,58,85), IntRect(227,115,88,83), IntRect(325,107,102,91), IntRect(437,107,102,91) };
     mWeaponAnims[W_IDLE].setup("w_idle", wIdle, 4, 6.f, true);
-    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 20.f, true);
+    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 6.f, true);
     mWeaponAnims[W_JUMP].setup("w_jump", wJump, 4, 6.f, false);
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 6, 24.f, true);
     mWeaponAnims[W_MELEE].setup("w_melee", wMelee, 6, 15.f, false);
@@ -944,7 +954,7 @@ void PlayerSoldier::setupPlayer2Flameshot()
     IntRect wShootI[4] = { IntRect(28,1071,83,80), IntRect(120,1073,79,78), IntRect(210,1071,77,80), IntRect(298,1071,81,80) };
     IntRect wMelee[6] = { IntRect(29,115,54,83), IntRect(95,115,52,85), IntRect(157,115,58,85), IntRect(227,115,88,83), IntRect(325,107,102,91), IntRect(437,107,102,91) };
     mWeaponAnims[W_IDLE].setup("w_idle", wIdle, 4, 6.f, true);
-    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 20.f, true);
+    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 6.f, true);
     mWeaponAnims[W_JUMP].setup("w_jump", wJump, 4, 6.f, false);
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 6, 20.f, true);
     mWeaponAnims[W_MELEE].setup("w_melee", wMelee, 6, 15.f, false);
@@ -959,7 +969,7 @@ void PlayerSoldier::setupPlayer2Laser()
     IntRect wShootI[4] = { IntRect(10,1509,83,80), IntRect(102,1511,79,78), IntRect(192,1509,79,80), IntRect(280,1509,81,80) };
     IntRect wMelee[6] = { IntRect(29,115,54,83), IntRect(95,115,52,85), IntRect(157,115,58,85), IntRect(227,115,88,83), IntRect(325,107,102,91), IntRect(437,107,102,91) };
     mWeaponAnims[W_IDLE].setup("w_idle", wIdle, 4, 6.f, true);
-    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 20.f, true);
+    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 6.f, true);
     mWeaponAnims[W_JUMP].setup("w_jump", wJump, 4, 6.f, false);
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 4, 12.f, false);
     mWeaponAnims[W_MELEE].setup("w_melee", wMelee, 6, 15.f, false);
@@ -974,7 +984,7 @@ void PlayerSoldier::setupPlayer2RL()
     IntRect wShootI[4] = { IntRect(12,1939,83,80), IntRect(104,1941,82,78), IntRect(192,1939,84,80), IntRect(279,1939,88,80) };
     IntRect wMelee[6] = { IntRect(29,115,54,83), IntRect(95,115,52,85), IntRect(157,115,58,85), IntRect(227,115,88,83), IntRect(325,107,102,91), IntRect(437,107,102,91) };
     mWeaponAnims[W_IDLE].setup("w_idle", wIdle, 4, 6.f, true);
-    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 20.f, true);
+    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 6.f, true);
     mWeaponAnims[W_JUMP].setup("w_jump", wJump, 4, 6.f, false);
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 4, 4.f, false);
     mWeaponAnims[W_MELEE].setup("w_melee", wMelee, 6, 15.f, false);
@@ -986,7 +996,7 @@ void PlayerSoldier::setupPlayer3Pistol()
     if (!mWeaponTexture.loadFromFile("Sprites/Group 28.png")) return;
     IntRect wShootI[9] = { IntRect(81,11,108,80), IntRect(195,9,112,82), IntRect(311,11,74,80), IntRect(429,11,70,80), IntRect(505,9,68,82), IntRect(583,13,78,78), IntRect(829,11,78,80) };
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 4, 12.f, false);
-    mWeaponTextureLoaded = true;
+    mWeaponTextureLoaded = false;
 }
 void PlayerSoldier::setupPlayer3HMG()
 {
@@ -996,7 +1006,7 @@ void PlayerSoldier::setupPlayer3HMG()
     IntRect wJump[6] = { IntRect(58,370,77,108), IntRect(144,372,77,104), IntRect(230,376,75,100), IntRect(316,378,75,96), IntRect(400,376,77,93), IntRect(486,376,79,87) };
     IntRect wShootI[4] = { IntRect(45,607,88,82), IntRect(133,607,88,82), IntRect(221,613,90,84), IntRect(313,615,90,82) };
     mWeaponAnims[W_IDLE].setup("w_idle", wIdle, 4, 6.f, true);
-    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 20.f, true);
+    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 6.f, true);
     mWeaponAnims[W_JUMP].setup("w_jump", wJump, 4, 6.f, false);
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 6, 24.f, true);
     mWeaponTextureLoaded = true;
@@ -1009,7 +1019,7 @@ void PlayerSoldier::setupPlayer3Flameshot()
     IntRect wJump[6] = { IntRect(37,813,92,95), IntRect(135,813,92,93), IntRect(233,813,90,91), IntRect(333,813,90,89), IntRect(427,813,90,86), IntRect(521,813,89,80) };
     IntRect wShootI[4] = { IntRect(40,919,83,77), IntRect(138,921,85,75), IntRect(236,921,87,75), IntRect(340,921,91,75) };
     mWeaponAnims[W_IDLE].setup("w_idle", wIdle, 4, 6.f, true);
-    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 20.f, true);
+    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 6.f, true);
     mWeaponAnims[W_JUMP].setup("w_jump", wJump, 4, 6.f, false);
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 6, 20.f, true);
     mWeaponTextureLoaded = true;
@@ -1022,7 +1032,7 @@ void PlayerSoldier::setupPlayer3Laser()
     IntRect wJump[6] = { IntRect(29,1231,92,95), IntRect(127,1231,92,93), IntRect(225,1231,90,91), IntRect(325,1231,90,89), IntRect(419,1231,90,86), IntRect(513,1231,90,80) };
     IntRect wShootI[4] = { IntRect(32,1337,83,77), IntRect(130,1339,87,75), IntRect(228,1339,91,75), IntRect(332,1339,93,75) };
     mWeaponAnims[W_IDLE].setup("w_idle", wIdle, 4, 6.f, true);
-    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 20.f, true);
+    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 6.f, true);
     mWeaponAnims[W_JUMP].setup("w_jump", wJump, 4, 6.f, false);
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 4, 12.f, false);
     mWeaponTextureLoaded = true;
@@ -1035,7 +1045,7 @@ void PlayerSoldier::setupPlayer3RL()
     IntRect wJump[6] = { IntRect(19,1639,92,95), IntRect(117,1639,92,93), IntRect(215,1639,90,91), IntRect(315,1639,90,89), IntRect(409,1639,90,86), IntRect(503,1639,92,80) };
     IntRect wShootI[4] = { IntRect(22,1745,85,77), IntRect(120,1747,87,75), IntRect(218,1747,89,75), IntRect(322,1747,93,75) };
     mWeaponAnims[W_IDLE].setup("w_idle", wIdle, 4, 6.f, true);
-    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 20.f, true);
+    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 6.f, true);
     mWeaponAnims[W_JUMP].setup("w_jump", wJump, 4, 6.f, false);
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 4, 4.f, false);
     mWeaponTextureLoaded = true;
@@ -1048,7 +1058,7 @@ void PlayerSoldier::setupPlayer4Pistol()
     IntRect wMelee[6] = { IntRect(51,137,52,82), IntRect(107,137,56,80), IntRect(167,139,70,76), IntRect(241,133,102,88), IntRect(615,139,54,76), IntRect(673,139,62,76) };
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 4, 12.f, false);
     mWeaponAnims[W_MELEE].setup("w_melee", wMelee, 6, 15.f, false);
-    mWeaponTextureLoaded = true;
+    mWeaponTextureLoaded = false;
 }
 void PlayerSoldier::setupPlayer4HMG()
 {
@@ -1059,7 +1069,7 @@ void PlayerSoldier::setupPlayer4HMG()
     IntRect wShootI[4] = { IntRect(53,594,130,79), IntRect(183,596,134,77), IntRect(319,596,130,77), IntRect(455,594,130,79) };
     IntRect wMelee[6] = { IntRect(51,137,52,82), IntRect(107,137,56,80), IntRect(167,139,70,76), IntRect(241,133,102,88), IntRect(615,139,54,76), IntRect(673,139,62,76) };
     mWeaponAnims[W_IDLE].setup("w_idle", wIdle, 4, 6.f, true);
-    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 20.f, true);
+    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 6.f, true);
     mWeaponAnims[W_JUMP].setup("w_jump", wJump, 4, 6.f, false);
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 6, 24.f, true);
     mWeaponAnims[W_MELEE].setup("w_melee", wMelee, 6, 15.f, false);
@@ -1074,7 +1084,7 @@ void PlayerSoldier::setupPlayer4Flameshot()
     IntRect wShootI[6] = { IntRect(24,1028,82,74), IntRect(110,1030,82,72), IntRect(196,1030,82,72), IntRect(282,1028,84,74) };
     IntRect wMelee[6] = { IntRect(51,137,52,82), IntRect(107,137,56,80), IntRect(167,139,70,76), IntRect(241,133,102,88), IntRect(615,139,54,76), IntRect(673,139,62,76) };
     mWeaponAnims[W_IDLE].setup("w_idle", wIdle, 4, 6.f, true);
-    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 20.f, true);
+    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 6.f, true);
     mWeaponAnims[W_JUMP].setup("w_jump", wJump, 4, 6.f, false);
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 6, 20.f, true);
     mWeaponAnims[W_MELEE].setup("w_melee", wMelee, 6, 15.f, false);
@@ -1089,7 +1099,7 @@ void PlayerSoldier::setupPlayer4Laser()
     IntRect wShootI[4] = { IntRect(20,1422,82,74), IntRect(106,1424,82,72), IntRect(192,1424,82,72), IntRect(278,1422,84,74) };
     IntRect wMelee[6] = { IntRect(51,137,52,82), IntRect(107,137,56,80), IntRect(167,139,70,76), IntRect(241,133,102,88), IntRect(615,139,54,76), IntRect(673,139,62,76) };
     mWeaponAnims[W_IDLE].setup("w_idle", wIdle, 4, 6.f, true);
-    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 20.f, true);
+    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 6.f, true);
     mWeaponAnims[W_JUMP].setup("w_jump", wJump, 4, 6.f, false);
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 4, 12.f, false);
     mWeaponAnims[W_MELEE].setup("w_melee", wMelee, 6, 15.f, false);
@@ -1104,9 +1114,206 @@ void PlayerSoldier::setupPlayer4RL()
     IntRect wShootI[4] = { IntRect(10,1806,82,74), IntRect(96,1808,82,72), IntRect(182,1808,82,72), IntRect(268,1806,84,74) };
     IntRect wMelee[6] = { IntRect(51,137,52,82), IntRect(107,137,56,80), IntRect(167,139,70,76), IntRect(241,133,102,88), IntRect(615,139,54,76), IntRect(673,139,62,76) };
     mWeaponAnims[W_IDLE].setup("w_idle", wIdle, 4, 6.f, true);
-    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 20.f, true);
+    mWeaponAnims[W_WALK].setup("w_walk", wWalk, 6, 6.f, true);
     mWeaponAnims[W_JUMP].setup("w_jump", wJump, 4, 6.f, false);
     mWeaponAnims[W_SHOOT_IDLE].setup("w_s_idle", wShootI, 4, 4.f, false);
     mWeaponAnims[W_MELEE].setup("w_melee", wMelee, 6, 15.f, false);
     mWeaponTextureLoaded = true;
+}
+/*
+void PlayerSoldier::restoreNormalForm()
+{
+    loadPlayerData();       // reloads texture + animations for this player index
+    setAnimation(IDLE);
+    equipWeapon(new Pistol(mAmmoTex));
+    mWeaponSlot = 0;
+}
+
+void PlayerSoldier::applyUndeadVisuals()
+{
+    // TODO: load your undead sprite sheet here, e.g.:
+    // mtexture.loadFromFile("Sprites/undead_p1.png");
+    // setupUndeadAnimations();
+    msprite.setTexture(mtexture);
+    setAnimation(IDLE);
+}
+
+void PlayerSoldier::applyMummyVisuals()
+{
+    // TODO: load your mummy sprite sheet here, e.g.:
+    // mtexture.loadFromFile("Sprites/mummy_p1.png");
+    // setupMummyAnimations();
+    msprite.setTexture(mtexture);
+    setAnimation(IDLE);
+}*/
+
+void PlayerSoldier::restoreNormalForm()
+{
+    loadPlayerData();       // reloads texture + animations for this player index
+    setAnimation(IDLE);
+    equipWeapon(new Pistol(mAmmoTex));
+    mWeaponSlot = 0;
+}
+
+void PlayerSoldier::applyUndeadVisuals()
+{
+    if (mplayerIndex == 0 || mplayerIndex == 1)
+    {
+        mUndeadTexture.loadFromFile("Sprites/zombiem.png");
+        mtexture = mUndeadTexture;
+        msprite.setTexture(mtexture);
+        setupMaleUndeadAnimations();
+        baseScale = 2.75f;
+    }
+    else
+    {
+        mUndeadTexture.loadFromFile("Sprites/zombief.png");
+        mtexture = mUndeadTexture;
+        msprite.setTexture(mtexture);
+        setupFemaleUndeadAnimations();
+        baseScale = 2.75f;
+    }
+
+    equipWeapon(new Pistol(mAmmoTex));
+    mWeaponSlot = 0;
+
+    setAnimation(IDLE);
+    mTransformTimer = 10.f;
+}
+
+void PlayerSoldier::applyMummyVisuals()
+{
+    if (mplayerIndex == 0 || mplayerIndex == 1)
+    {
+        mMummyTexture.loadFromFile("Sprites/mummym.png");
+        mtexture = mMummyTexture;
+        msprite.setTexture(mtexture);
+        setupMaleMummyAnimations();
+        baseScale = 0.85f;
+    }
+    else
+    {
+        mMummyTexture.loadFromFile("Sprites/mummyf.png");
+        mtexture = mMummyTexture;
+        msprite.setTexture(mtexture);
+        setupFemaleMummyAnimations();
+        baseScale = 0.85f;
+    }
+
+
+    delete mTransformState;
+    mTransformState = new MummyState();
+    setAnimation(IDLE);
+    mTransformTimer = 10.f;
+}
+
+void PlayerSoldier::forcePistol()
+{
+    delete m_weapon;
+    m_weapon = new Pistol(mAmmoTex);
+    mWeaponSlot = 0;
+    if (mplayerIndex == 0) setupPlayer1Pistol();
+    else if (mplayerIndex == 1) setupPlayer2Pistol();
+    else if (mplayerIndex == 2) setupPlayer3Pistol();
+    else if (mplayerIndex == 3) setupPlayer4Pistol();
+}
+
+void PlayerSoldier::disarm()
+{
+    delete m_weapon;
+    m_weapon = nullptr;
+    mWeaponTextureLoaded = false;
+    mCurrentWeaponAnim = W_NONE;
+    mWeaponSprite = sf::Sprite();
+}
+
+void PlayerSoldier::setupMaleUndeadAnimations()
+{
+    IntRect idle[4] = { IntRect(8,143,43,39), IntRect(56,143,45,39), IntRect(106,142,47,40) , IntRect(158,142,49,40) };
+    IntRect walk[7] = { IntRect(204,281,37,41), IntRect(246,283,38,39), IntRect(289,285,41,37) , IntRect(335,286,43,36), IntRect(383,285,37,37) , IntRect(425,285,35,37) , IntRect(465,284,37,38) };
+    IntRect jumpIdle[6] = { IntRect(53,382,41,42),  IntRect(99,382,40,43),  IntRect(144,382,41,44),  IntRect(190,382,41,45),  IntRect(236,382,41,45),  IntRect(282,382,45,42) };
+    IntRect jumpRun[6] = { IntRect(53,382,41,42),  IntRect(99,382,40,43),  IntRect(144,382,41,44),  IntRect(190,382,41,45),  IntRect(236,382,41,45),  IntRect(282,382,45,42) };
+
+    manimations[IDLE].setup("idle", idle, 4, 6.f, true);
+    manimations[WALK].setup("walk", walk, 7, 7.f, true);
+    manimations[JUMP_IDLE].setup("jump_idle", jumpIdle, 6, 6.f, false);
+    manimations[JUMP_RUN].setup("jump_run", jumpRun, 6, 6.f, false);
+}
+
+void PlayerSoldier::setupFemaleUndeadAnimations()
+{
+    IntRect idle[4] = { IntRect(105,147,41,38), IntRect(153,147,38,38), IntRect(196,147,42,38) , IntRect(243,147,44,38) };
+    IntRect walk[7] = { IntRect(322,241,41,39), IntRect(368,240,40,40), IntRect(413,241,40,39) , IntRect(458,242,41,38), IntRect(307,289,40,39) , IntRect(352,289,40,39) , IntRect(397,290,41,38) };
+    IntRect jumpIdle[6] = { IntRect(44,475,33,41),  IntRect(82,475,35,42),  IntRect(123,475,37,41),  IntRect(167,476,37,41),  IntRect(214,476,35,44),  IntRect(254,477,40,45) };
+    IntRect jumpRun[6] = { IntRect(44,475,33,41),  IntRect(82,475,35,42),  IntRect(123,475,37,41),  IntRect(167,476,37,41),  IntRect(214,476,35,44),  IntRect(254,477,40,45) };
+
+    manimations[IDLE].setup("idle", idle, 4, 6.f, true);
+    manimations[WALK].setup("walk", walk, 7, 7.f, true);
+    manimations[JUMP_IDLE].setup("jump_idle", jumpIdle, 6, 6.f, false);
+    manimations[JUMP_RUN].setup("jump_run", jumpRun, 6, 6.f, false);
+}
+
+void PlayerSoldier::setupMaleMummyAnimations()
+{
+    IntRect idle[4] = { IntRect(29,31,108,145), IntRect(193,31,104,145), IntRect(357,31,104,145), IntRect(521,31,104,145) };
+    // IntRect idle[4] = {  };
+    IntRect walk[7] = { IntRect(342,211,112,145), IntRect(486,211,112,145), IntRect(624,211,116,144), IntRect(772,211,116,141), IntRect(929,211,109,143), IntRect(1095,211,107,144), IntRect(1254,211,99,144) };
+    // IntRect jumpIdle[6] = { /* ... */ };
+    // IntRect jumpRun[6] = { /* ... */ };
+    IntRect jumpRun[4] = { IntRect(29,31,108,145), IntRect(193,31,104,145), IntRect(357,31,104,145), IntRect(521,31,104,145) };
+    IntRect melee[6] = { IntRect(226,445,98,175), IntRect(399,451,83,181), IntRect(527,451,83,189), IntRect(780,441,100,175), IntRect(923,441,103,147), IntRect(1087,441,107,147) };
+    IntRect jumpIdle[4] = { IntRect(29,31,108,145), IntRect(193,31,104,145), IntRect(357,31,104,145), IntRect(521,31,104,145) };
+
+    manimations[IDLE].setup("idle", idle, 4, 6.f, true);
+    manimations[WALK].setup("walk", walk, 7, 7.f, true);
+    manimations[JUMP_IDLE].setup("jump_idle", jumpIdle, 4, 6.f, false);
+    manimations[JUMP_RUN].setup("jump_run", jumpRun, 4, 6.f, false);
+    //  manimations[JUMP_IDLE].setup("jump_idle", jumpIdle, 6, 6.f, false);
+     // manimations[JUMP_RUN].setup("jump_run", jumpRun, 6, 6.f, false);
+    manimations[MELEE].setup("melee", melee, 6, 15.f, false);
+}
+
+void PlayerSoldier::setupFemaleMummyAnimations()
+{
+    IntRect idle[4] = { IntRect(28,18,118,151), IntRect(192,18,120,151), IntRect(354,14,118,151), IntRect(514,12,120,151) };
+    IntRect walk[7] = { IntRect(352,235,111,150), IntRect(496,241,109,153), IntRect(616,245,113,148), IntRect(766,235,111,148), IntRect(916,229,119,153), IntRect(1074,225,125,153), IntRect(1242,225,113,154) };
+    // IntRect jumpIdle[6] = { /* ... */ };
+    // IntRect jumpRun[6] = { /* ... */ };
+    IntRect melee[6] = { IntRect(359,435,124,156), IntRect(689,413,116,176), IntRect(831,397,102,196), IntRect(959,409,100,180), IntRect(1495,413,118,176), IntRect(1639,433,116,152) };
+    IntRect jumpIdle[4] = { IntRect(28,18,118,151), IntRect(192,18,120,151), IntRect(354,14,118,151), IntRect(514,12,120,151) };
+    IntRect jumpRun[4] = { IntRect(28,18,118,151), IntRect(192,18,120,151), IntRect(354,14,118,151), IntRect(514,12,120,151) };
+
+
+    manimations[IDLE].setup("idle", idle, 4, 6.f, true);
+    manimations[WALK].setup("walk", walk, 7, 7.f, true);
+    manimations[JUMP_IDLE].setup("jump_idle", jumpIdle, 4, 6.f, false);
+    manimations[JUMP_RUN].setup("jump_run", jumpRun, 4, 6.f, false);
+    // manimations[JUMP_IDLE].setup("jump_idle", jumpIdle, 6, 6.f, false);
+    // manimations[JUMP_RUN].setup("jump_run", jumpRun, 6, 6.f, false);
+    manimations[MELEE].setup("melee", melee, 6, 15.f, false);
+}
+
+void PlayerSoldier::addSaturation(int amount)
+{
+    mSaturation += amount;
+    if (mSaturation > mMaxSaturation)
+        mSaturation = mMaxSaturation;
+}
+
+void PlayerSoldier::receiveCrate(int weaponSlot, int grenadeCount, bool fireBomb)
+{
+    // Eri (female players) converts hand grenades to fire bombs
+    bool isEri = (mplayerIndex == 2 || mplayerIndex == 3);
+    if (isEri) fireBomb = true;
+
+    mGrenadeCount += grenadeCount;
+    mWeaponSlot = weaponSlot;
+
+    switch (weaponSlot)
+    {
+    case 1: equipWeapon(new HeavyMachineGun(mAmmoTex)); break;
+    case 2: equipWeapon(new FlameShot(mAmmoTex));       break;
+    case 3: equipWeapon(new LaserGun(mAmmoTex));        break;
+    case 4: equipWeapon(new RocketLauncher(mAmmoTex));  break;
+    }
 }

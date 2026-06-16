@@ -5,6 +5,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include "LoadingState.h"
 
+
 PlayState::PlayState(int screenW, int screenH, int id, int numPlayers)
     : screenWidth(screenW), screenHeight(screenH),
     playerCount(numPlayers), enemyCount(0), activePlayer(0),
@@ -16,13 +17,14 @@ PlayState::PlayState(int screenW, int screenH, int id, int numPlayers)
     levelManager->getLevel()->setBiome(biomeId);
    
     if (biomeId == 0)
-        levelEndX = 4500;
+      levelEndX = 4000;
+        
 
     else if (biomeId == 1)
-        levelEndX = 4500;
+        levelEndX = 4700;
 
     else
-        levelEndX = 3500;
+        levelEndX = 3000;
 
     /*spawnPlayers(id);
     spawnEnemies(id);*/
@@ -34,9 +36,12 @@ PlayState::PlayState(int screenW, int screenH, int id, int numPlayers)
     lvlHeight = levelManager->getLevel()->getHeight();
 
     spawnPlayers(id);
+    prisonerCount = 0;
     spawnEnemies(id);
     spawnCollectibles(id);
 
+   
+    
     mFont.loadFromFile("Sprites/Font/metal-slug.ttf");   // swap for your font path
 
     // score text — top center
@@ -60,9 +65,10 @@ PlayState::PlayState(int screenW, int screenH, int id, int numPlayers)
     //spawnCollectibles(id);
 
 
-    // red damage overlay — full screen, drawn conditionally
+    // red damage overlay
     mRedOverlay.setSize(sf::Vector2f((float)screenWidth, (float)screenHeight));
-
+    mBlueOverlay.setSize(sf::Vector2f((float)screenWidth, (float)screenHeight));
+    mBlueOverlay.setFillColor(sf::Color(0, 100, 255, 60));  // adjust alpha to taste
     
 }
 
@@ -101,23 +107,11 @@ void PlayState::spawnEnemies(int biomeId) {
 
     if (biomeId == 0) {
 
-
+        
         //batch of infantry
 
     //////rebel soldier
 
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::RebelSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(760.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-
 
         if (enemyCount < max)
         {
@@ -125,19 +119,7 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(900.f, 500.f);
-                enemyCount++;
-            }
-        }
-        
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::RebelSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1200.f, 500.f);
+                enemies[enemyCount]->setPosition(3800.f, 500.f);
                 enemyCount++;
             }
         }
@@ -148,18 +130,7 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(1600.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::RebelSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2000.f, 500.f);
+                enemies[enemyCount]->setPosition(2600.f, 500.f);
                 enemyCount++;
             }
         }
@@ -171,7 +142,7 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(3000.f, 500.f);
+                enemies[enemyCount]->setPosition(2050.f, 500.f);
                 enemyCount++;
             }
         }
@@ -186,7 +157,7 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(820.f, 500.f);
+                enemies[enemyCount]->setPosition(1820.f, 500.f);
                 enemyCount++;
             }
         }
@@ -197,7 +168,7 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(1200.f, 500.f);
+                enemies[enemyCount]->setPosition(1000.f, 500.f);
                 enemyCount++;
             }
         }
@@ -208,57 +179,12 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(1600.f, 500.f);
+                enemies[enemyCount]->setPosition(1550.f, 500.f);
                 enemyCount++;
             }
         }
 
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::ShieldedSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2000.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::ShieldedSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::ShieldedSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3000.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::ShieldedSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-
-
+        
         /////grenade soldier
        
         if (enemyCount < max)
@@ -267,7 +193,7 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(600.f, 500.f);
+                enemies[enemyCount]->setPosition(3000.f, 500.f);
                 enemyCount++;
             }
         }
@@ -279,7 +205,7 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(800.f, 500.f);
+                enemies[enemyCount]->setPosition(1100.f, 500.f);
                 enemyCount++;
             }
         }
@@ -290,78 +216,12 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(900.f, 500.f);
+                enemies[enemyCount]->setPosition(3400.f, 500.f);
                 enemyCount++;
             }
         }
 
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3900.f, 500.f);
-                enemyCount++;
-            }
-        }
-
+        
         ////bazooka solldier
 
         if (enemyCount < max)
@@ -370,7 +230,7 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(600.f, 500.f);
+                enemies[enemyCount]->setPosition(1950.f, 500.f);
                 enemyCount++;
             }
         }
@@ -381,7 +241,7 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(800.f, 500.f);
+                enemies[enemyCount]->setPosition(3300.f, 500.f);
                 enemyCount++;
             }
         }
@@ -392,77 +252,12 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(1200.f, 500.f);
+                enemies[enemyCount]->setPosition(2650.f, 500.f);
                 enemyCount++;
             }
         }
         
 
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1800.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2000.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2600.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1700.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3854.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2467.f, 500.f);
-                enemyCount++;
-            }
-        }
         
         ////batch of undead
         
@@ -474,7 +269,7 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(600.f, 500.f);
+                enemies[enemyCount]->setPosition(750.f, 500.f);
                 enemyCount++;
             }
         }
@@ -485,7 +280,7 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(800.f, 500.f);
+                enemies[enemyCount]->setPosition(1150.f, 500.f);
                 enemyCount++;
             }
         }
@@ -496,56 +291,14 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(1300.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Zombie);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1700.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Zombie);
-
-            if (enemies[enemyCount])
-            {
                 enemies[enemyCount]->setPosition(2500.f, 500.f);
                 enemyCount++;
             }
         }
 
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Zombie);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3456.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Zombie);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2368.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        //////mummy
+        
+        
+        //////mummy 
 
         if (enemyCount < max)
         {
@@ -553,7 +306,18 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(670.f, 500.f);
+                enemies[enemyCount]->setPosition(850.f, 500.f);
+                enemyCount++;
+            }
+        }
+        
+        if (enemyCount < max)
+        {
+            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Mummy);
+
+            if (enemies[enemyCount])
+            {
+                enemies[enemyCount]->setPosition(1250.f, 500.f);
                 enemyCount++;
             }
         }
@@ -564,68 +328,17 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(800.f, 500.f);
+                enemies[enemyCount]->setPosition(2300.f, 500.f);
                 enemyCount++;
             }
         }
 
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Mummy);
+        
 
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(900.f, 500.f);
-                enemyCount++;
-            }
-        }
+        //prisoner
 
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Mummy);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1400.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Mummy);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1900.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Mummy);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Mummy);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3400.f, 500.f);
-                enemyCount++;
-            }
-        }
-        /*enemies[enemyCount] = Enemies::createEnemy(EnemyType::Paratrooper);
-        enemies[enemyCount]->setPosition(900.f, -100.f);
-        enemyCount++;*/
+        prisoners[prisonerCount++].setup(1500.f, 720.f);
+       // prisoners[prisonerCount++].setup(2600.f, 500.f);
 
     } //for plain
 
@@ -646,23 +359,11 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(760.f, 500.f);
+                enemies[enemyCount]->setPosition(2800.f, 500.f);
                 enemyCount++;
             }
         }
 
-
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::RebelSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(900.f, 500.f);
-                enemyCount++;
-            }
-        }
 
 
         if (enemyCount < max)
@@ -676,16 +377,6 @@ void PlayState::spawnEnemies(int biomeId) {
             }
         }
 
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::RebelSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1600.f, 500.f);
-                enemyCount++;
-            }
-        }
 
         if (enemyCount < max)
         {
@@ -693,24 +384,12 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(2000.f, 500.f);
+                enemies[enemyCount]->setPosition(3750.f, 500.f);
                 enemyCount++;
             }
         }
 
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::RebelSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3000.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-
+       
         //////shielded soldier
 
 
@@ -720,7 +399,7 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(820.f, 500.f);
+                enemies[enemyCount]->setPosition(2950.f, 500.f);
                 enemyCount++;
             }
         }
@@ -731,40 +410,7 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(1200.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::ShieldedSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1600.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::ShieldedSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2000.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::ShieldedSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2500.f, 500.f);
+                enemies[enemyCount]->setPosition(3450.f, 500.f);
                 enemyCount++;
             }
         }
@@ -780,32 +426,12 @@ void PlayState::spawnEnemies(int biomeId) {
             }
         }
 
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::ShieldedSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
+       
 
 
         /////grenade soldier
 
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(600.f, 500.f);
-                enemyCount++;
-            }
-        }
-
+        
 
         if (enemyCount < max)
         {
@@ -813,7 +439,7 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(800.f, 500.f);
+                enemies[enemyCount]->setPosition(3700.f, 500.f);
                 enemyCount++;
             }
         }
@@ -824,7 +450,7 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(900.f, 500.f);
+                enemies[enemyCount]->setPosition(2100.f, 500.f);
                 enemyCount++;
             }
         }
@@ -832,6 +458,71 @@ void PlayState::spawnEnemies(int biomeId) {
         if (enemyCount < max)
         {
             enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
+
+            if (enemies[enemyCount])
+            {
+                enemies[enemyCount]->setPosition(2500.f, 500.f);
+                enemyCount++;
+            }
+        }
+
+        ////bazooka solldier
+
+        
+
+        if (enemyCount < max)
+        {
+            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
+
+            if (enemies[enemyCount])
+            {
+                enemies[enemyCount]->setPosition(2800.f, 500.f);
+                enemyCount++;
+            }
+        }
+
+        if (enemyCount < max)
+        {
+            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
+
+            if (enemies[enemyCount])
+            {
+                enemies[enemyCount]->setPosition(2250.f, 500.f);
+                enemyCount++;
+            }
+        }
+
+        if (enemyCount < max)
+        {
+            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
+
+            if (enemies[enemyCount])
+            {
+                enemies[enemyCount]->setPosition(1600.f, 500.f);
+                enemyCount++;
+            }
+        }
+
+        ////batch of undead
+
+        //////////zombie
+
+        
+
+        if (enemyCount < max)
+        {
+            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Marine);
+
+            if (enemies[enemyCount])
+            {
+                enemies[enemyCount]->setPosition(2150.f, 500.f);
+                enemyCount++;
+            }
+        }
+
+        if (enemyCount < max)
+        {
+            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Marine);
 
             if (enemies[enemyCount])
             {
@@ -842,239 +533,11 @@ void PlayState::spawnEnemies(int biomeId) {
 
         if (enemyCount < max)
         {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3900.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        ////bazooka solldier
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(600.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(800.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1200.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1800.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2000.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2600.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1700.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3854.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2467.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        ////batch of undead
-
-        //////////zombie
-
-        if (enemyCount < max)
-        {
             enemies[enemyCount] = Enemies::createEnemy(EnemyType::Marine);
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(600.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Marine);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(800.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Marine);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1300.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Marine);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1700.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Marine);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Marine);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3456.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Marine);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2368.f, 500.f);
+                enemies[enemyCount]->setPosition(900.f, 500.f);
                 enemyCount++;
             }
         }
@@ -1087,7 +550,7 @@ void PlayState::spawnEnemies(int biomeId) {
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(670.f, 500.f);
+                enemies[enemyCount]->setPosition(1000.f, 500.f);
                 enemyCount++;
             }
         }
@@ -1095,410 +558,6 @@ void PlayState::spawnEnemies(int biomeId) {
         if (enemyCount < max)
         {
             enemies[enemyCount] = Enemies::createEnemy(EnemyType::Paratrooper);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(800.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Paratrooper);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(900.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Paratrooper);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1400.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Paratrooper);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1900.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Paratrooper);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Paratrooper);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3400.f, 500.f);
-                enemyCount++;
-            }
-        }
-        /*enemies[enemyCount] = Enemies::createEnemy(EnemyType::Paratrooper);
-        enemies[enemyCount]->setPosition(900.f, -100.f);
-        enemyCount++;*/
-
-    } //for aerial
-
-  ///////////////////BIOME 2
-
-    if (biomeId == 2) {
-
-        //batch of infantry
-
-    //////rebel soldier
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::RebelSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(760.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::RebelSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(900.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::RebelSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1200.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::RebelSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1600.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::RebelSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2000.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::RebelSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3000.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-
-        //////shielded soldier
-
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::ShieldedSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(820.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::ShieldedSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1200.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::ShieldedSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1600.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::ShieldedSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2000.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::ShieldedSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::ShieldedSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3000.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::ShieldedSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-
-
-        /////grenade soldier
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(600.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(800.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(900.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3500.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::GrenadeSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(3900.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        ////bazooka solldier
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(600.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(800.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1200.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(1800.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2000.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
-
-            if (enemies[enemyCount])
-            {
-                enemies[enemyCount]->setPosition(2600.f, 500.f);
-                enemyCount++;
-            }
-        }
-
-        if (enemyCount < max)
-        {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
 
             if (enemies[enemyCount])
             {
@@ -1509,22 +568,75 @@ void PlayState::spawnEnemies(int biomeId) {
 
         if (enemyCount < max)
         {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
+            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Paratrooper);
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(3854.f, 500.f);
+                enemies[enemyCount]->setPosition(2300.f, 500.f);
+                enemyCount++;
+            }
+        }
+
+        /*enemies[enemyCount] = Enemies::createEnemy(EnemyType::Paratrooper);
+        enemies[enemyCount]->setPosition(900.f, -100.f);
+        enemyCount++;*/
+
+        //prisoner
+
+        prisoners[prisonerCount++].setup(1700.f, 715.f);
+        prisoners[prisonerCount++].setup(2600.f, 900.f);
+
+
+    } //for aerial
+
+  ///////////////////BIOME 2
+
+    if (biomeId == 2) {
+
+        //batch of infantry
+
+    //////zombie
+        if (enemyCount < max)
+        {
+            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Zombie);
+
+            if (enemies[enemyCount])
+            {
+                enemies[enemyCount]->setPosition(1000.f, 500.f);
                 enemyCount++;
             }
         }
 
         if (enemyCount < max)
         {
-            enemies[enemyCount] = Enemies::createEnemy(EnemyType::BazookaSoldier);
+            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Zombie);
 
             if (enemies[enemyCount])
             {
-                enemies[enemyCount]->setPosition(2467.f, 500.f);
+                enemies[enemyCount]->setPosition(1200.f, 500.f);
+                enemyCount++;
+            }
+        }
+
+
+        if (enemyCount < max)
+        {
+            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Zombie);
+
+            if (enemies[enemyCount])
+            {
+                enemies[enemyCount]->setPosition(1900.f, 500.f);
+                enemyCount++;
+            }
+        }
+
+        if (enemyCount < max)
+        {
+            enemies[enemyCount] = Enemies::createEnemy(EnemyType::Zombie);
+
+            if (enemies[enemyCount])
+            {
+                enemies[enemyCount]->setPosition(1500.f, 500.f);
                 enemyCount++;
             }
         }
@@ -1585,20 +697,20 @@ void PlayState::handleInput(sf::RenderWindow& window)
 
 void PlayState::update(float dt)
 {
-    // set active flags
+   
     for (int i = 0; i < playerCount; i++)
         players[i]->setActive(i == activePlayer);
 
-    // only update the active player
+    
     if (players[activePlayer]->isPlayerAlive())
         players[activePlayer]->update(dt, lvl, cellSize, lvlWidth, lvlHeight, biomeId);
 
-    for (int i = 0; i < enemyCount; i++)
+   /* for (int i = 0; i < enemyCount; i++)
     {
         if (!enemies[i]->isAlive()) continue;
         enemies[i]->setTarget(players[activePlayer]->getSprite().getPosition());
         enemies[i]->update(dt, lvl, cellSize, lvlWidth, lvlHeight, biomeId);
-    }
+    }*/
 
     //bool playerDead = true;
 
@@ -1622,15 +734,34 @@ void PlayState::update(float dt)
     checkProjectileEnemyCollisions();
     checkEnemyPlayerCollisions();
 
+    sf::FloatRect playerBounds = players[activePlayer]->getSprite().getGlobalBounds();
+
+    for (int i = 0; i < prisonerCount; i++)
+    {
+        prisoners[i].update(dt);
+        prisoners[i].tryFree(playerBounds);
+
+        if (prisoners[i].isCrateActive() &&
+            prisoners[i].getCrateBounds().intersects(playerBounds))
+        {
+            prisoners[i].collectCrate();
+        }
+    }
+
     for (int i = 0; i < enemyCount; i++)
     {
-        if (!enemies[i]->isAlive()) continue;
+        // Check replacement FIRST, even on dead enemies
         Enemies* replacement = enemies[i]->getLandedReplacement();
         if (replacement != nullptr)
         {
             delete enemies[i];
             enemies[i] = replacement;
+            continue;
         }
+
+        if (!enemies[i]->isAlive()) continue;
+        enemies[i]->setTarget(players[activePlayer]->getSprite().getPosition());
+        enemies[i]->update(dt, lvl, cellSize, lvlWidth, lvlHeight, biomeId);
     }
 
     if (players[activePlayer]->getSprite().getPosition().x > levelEndX)
@@ -1884,7 +1015,7 @@ void PlayState::checkProjectileEnemyCollisions()
         w->resolveHits(enemies, enemyCount, cellSize, mScore);
     }
 }
-
+/*
 void PlayState::checkEnemyPlayerCollisions()
 {
     for (int i = 0; i < enemyCount; i++)
@@ -1896,7 +1027,39 @@ void PlayState::checkEnemyPlayerCollisions()
             players[activePlayer]->takeDamage();
         }
     }
+}*/
+
+void PlayState::checkEnemyPlayerCollisions()
+{
+    for (int i = 0; i < enemyCount; i++)
+    {
+        if (!enemies[i]->isAlive()) continue;
+        if (enemies[i]->getSprite().getGlobalBounds()
+            .intersects(players[activePlayer]->getSprite().getGlobalBounds()))
+        {
+            EnemyType type = enemies[i]->getType();
+
+            if (type == EnemyType::Zombie)
+            {
+                players[activePlayer]->applyUndeadVisuals();
+                //players[activePlayer]->disarm();
+            }
+            else if (type == EnemyType::Mummy)
+            {
+                players[activePlayer]->applyMummyVisuals();
+                players[activePlayer]->disarm();
+            }
+            else
+            {
+                players[activePlayer]->takeDamage();
+            }
+
+
+
+        }
+    }
 }
+
 
 
 void PlayState::draw(sf::RenderWindow& window)
@@ -1917,17 +1080,57 @@ void PlayState::draw(sf::RenderWindow& window)
     levelManager->draw(window);  //drawing tiles
 
    
-    for (int i = 0; i < playerCount; i++)
-    {
+   // for (int i = 0; i < playerCount; i++)
+        {
+            int i = activePlayer;
+            if (players[i]->isPlayerAlive())
+            {
+                sf::Sprite& s = players[i]->getSprite();
+
+                float worldX = s.getPosition().x;
+                float worldY = s.getPosition().y;
+
+                s.setPosition(worldX - camX, worldY - camY);
+
+                if (!players[i]->isWeaponLoaded())
+                    window.draw(s);
+
+                // draw projectiles for ANY weapon (including pistol)
+                if (players[i]->getWeapon())
+                {
+                    sf::View camView = window.getDefaultView();
+                    camView.move((float)camX, (float)camY);
+                    window.setView(camView);
+                    players[i]->getWeapon()->draw(window);
+                    window.setView(window.getDefaultView());
+                }
+
+                // draw weapon sprite overlay only for non-pistol weapons
+                if (players[i]->isWeaponLoaded())
+                {
+                    sf::Sprite& ws = players[i]->getWeaponSprite();
+                    ws.setPosition(worldX - camX, worldY - camY);
+                    window.draw(ws);
+                }
+
+                players[activePlayer]->drawDevMode(window);
+
+                s.setPosition(worldX, worldY);
+            }
+        }
+        
+        /* {
         if (!players[i]->isPlayerAlive()) continue;
         sf::Sprite& s = players[i]->getSprite();
 
         float worldX = s.getPosition().x;
-        float worldY = s.getPosition().y;
+        float worldY = s.getPosition().y;*/
 
-        s.setPosition(worldX - camX, worldY - camY);
+      /*  s.setPosition(worldX - camX, worldY - camY);
 
-        window.draw(s);
+        //window.draw(s);
+        if (!players[i]->isWeaponLoaded())
+            window.draw(s);
 
 
         if (players[i]->isWeaponLoaded())
@@ -1943,9 +1146,31 @@ void PlayState::draw(sf::RenderWindow& window)
 
             ws.setPosition(worldX - camX, worldY - camY);
             window.draw(ws);
+        }*//*
+        s.setPosition(worldX - camX, worldY - camY);
+
+        if (!players[i]->isWeaponLoaded())
+            window.draw(s);
+
+        // draw projectiles for ANY weapon (including pistol)
+        if (players[i]->getWeapon())
+        {
+            sf::View camView = window.getDefaultView();
+            camView.move((float)camX, (float)camY);
+            window.setView(camView);
+            players[i]->getWeapon()->draw(window);
+            window.setView(window.getDefaultView());
         }
 
-        players[activePlayer]->drawDevMode(window);
+        // draw weapon sprite overlay only for non-pistol weapons
+        if (players[i]->isWeaponLoaded())
+        {
+            sf::Sprite& ws = players[i]->getWeaponSprite();
+            ws.setPosition(worldX - camX, worldY - camY);
+            window.draw(ws);
+        }
+
+        players[activePlayer]->drawDevMode(window);*/
        /* if (players[i]->isWeaponLoaded())
         {
             sf::Sprite& ws = players[i]->getWeaponSprite();
@@ -1955,10 +1180,10 @@ void PlayState::draw(sf::RenderWindow& window)
             ws.setPosition(worldX - camX, worldY - camY);
 
             window.draw(ws);
-        }*/
+        }*//*
 
-        s.setPosition(worldX, worldY);
-    }
+        s.setPosition(worldX, worldY);*/
+    
 
    
     for (int i = 0; i < enemyCount; i++)
@@ -2001,6 +1226,8 @@ void PlayState::draw(sf::RenderWindow& window)
         window.draw(collectibles[i]);
     }
 
+    for (int i = 0; i < prisonerCount; i++)
+        prisoners[i].draw(window, camX, camY);
     
 
     // ---- red damage overlay for active player ----
@@ -2015,6 +1242,11 @@ void PlayState::draw(sf::RenderWindow& window)
         mRedOverlay.setFillColor(sf::Color(255, 0, 0, 130));
         window.draw(mRedOverlay);
     }
+
+    // ---- blue water tint for biome 2 ----
+    if (biomeId == 2)
+        window.draw(mBlueOverlay);
+
 
     // ---- score HUD ----
     char scoreBuf[64];

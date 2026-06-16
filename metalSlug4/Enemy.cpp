@@ -29,7 +29,7 @@ void EnemyAI::update(float dt, int& stateOut, float distToPlayer, const Animatio
     else if (distToPlayer <= detectionRange)
         stateOut = 1;           //walking towards player
     else
-        stateOut = 0;           // out of range —
+        stateOut = 0;           // out of range 
 }
 
 
@@ -60,29 +60,23 @@ Enemies::Enemies(int dmg, float spd, int hp)
 
 Enemies::~Enemies() {}
 
-// ---- convenience setters -----------------------------------------------
 
 void Enemies::setPosition(float x, float y)
 {
     m_sprite.setPosition(x, y);
 }
 
-// Call this after loading the texture so the collision box scales too.
-// baseScale = 2.f means the sprite is drawn at 2× its original pixel size.
 void Enemies::setScale(float scale)
 {
     baseScale = scale;
 
-    // Scale the collision box proportionally so it still wraps the sprite.
-    // Tweak the base values (24, 36, 4, 2) to match your sprite's actual size
-    // at scale 1.0 and everything else follows automatically.
+   
     collisionWidth = 24.f * scale;
     collisionHeight = 36.f * scale;
     collisionOffsetX = 4.f * scale;
     collisionOffsetY = 2.f * scale;
 }
 
-// Call every frame from main with the player's centre position.
 void Enemies::setTarget(sf::Vector2f targetPos)
 {
     m_targetPos = targetPos;
@@ -159,7 +153,7 @@ Animation* Enemies::getCurrentAnimation() { return m_currentAnimation; }
 sf::Sprite& Enemies::getSprite() { return m_sprite; }
 bool        Enemies::isAlive() const { return alive; }
 
-// ---- AI (delegates to m_ai) -------------------------------------------
+// ---- AI-------------------------------------------
 
 void Enemies::updateAI(float dt)
 {
@@ -319,12 +313,7 @@ void Enemies::update(float dt, char** lvl, int cell_size, int mapWidth, int mapH
     updateCollisionForAnimation();
     physicsUpdate(dt, lvl, cell_size, mapWidth, mapHeight, biomeId);
 
-    // Apply facing direction.
-    // Sprites face LEFT by default (facingRight = false → normal scale).
-    // When facing right we flip on X around the sprite's left edge.
-    // If the sprite jumps sideways when flipped, set the origin to its
-    // horizontal centre after loading the texture:
-    //   m_sprite.setOrigin(m_texture.getSize().x / 2.f, 0.f);
+   
     if (facingRight)
         m_sprite.setScale(-baseScale, baseScale);
     else
@@ -337,11 +326,8 @@ void Enemies::update(float dt, char** lvl, int cell_size, int mapWidth, int mapH
     }
 }
 
-// ================================================================== subclasses ==
 
-// Shared move() logic: walk toward the target, flip to face it.
-// Each subclass just calls this helper — avoids copy-pasting into every class.
-// The only thing subclasses customise is speed (set in their constructor).
+
 namespace
 {
     void chaseMove(Enemies& e, float speed, int state,
@@ -362,7 +348,9 @@ namespace
     }
 }
 
-// ------------------------------------------------------------------ Infantry ---
+/// <summary>
+/// /////////////////////////////////////////////////////////////INFATRY//////////////////////
+/// </summary>
 
 class Infantry : public Enemies
 {
@@ -371,7 +359,9 @@ public:
     virtual void move(float dt) = 0;
 };
 
-// ------------------------------------------------------------------ RebelSoldier ---
+/// <summary>
+/// //////////////////////////REBELSOLDIER////////////////////////////////////////////////
+/// </summary>
 
 class RebelSoldier : public Infantry
 {
@@ -388,8 +378,8 @@ public:/*
         collisionOffsetX = 4.f;
         collisionOffsetY = 0.f;
     }*/
-
-    RebelSoldier() : Infantry(10, 2.0f, 120)
+    EnemyType getType() const override { return EnemyType::RebelSoldier; }
+    RebelSoldier() : Infantry(10, 1.0f, 120)
     {
         static sf::Texture sharedTex;
         static bool loaded = false;
@@ -397,7 +387,7 @@ public:/*
         m_sprite.setTexture(sharedTex);
         setupAnimations();
         setAnimation("idle");
-        setScale(2.75f);
+        setScale(3.0f);
         collisionWidth = 40.f * 3.f;
         collisionHeight = 38.f * 3.f;
         collisionOffsetX = 4.f;
@@ -475,11 +465,14 @@ private:
     }
 };
 
-// ------------------------------------------------------------------ ShieldedSoldier ---
+/////////////////////////////////////////////////SHILEDED SOLDIER////////////////////////////////////////////////////////
 
 class ShieldedSoldier : public Infantry
 {
 public:
+    EnemyType getType() const override {
+        return EnemyType::ShieldedSoldier;
+    }
    /* ShieldedSoldier() : Infantry(10, 2.0f, 120)
     {
         m_texture.loadFromFile("Sprites/shieldedrebelsoldier.png");
@@ -493,7 +486,7 @@ public:
         collisionOffsetY = 0.f;
     }*/
 
-    ShieldedSoldier() : Infantry(10, 2.0f, 120)
+    ShieldedSoldier() : Infantry(10, 1.0f, 120)
     {
         static sf::Texture sharedTex;
         static bool loaded = false;
@@ -501,7 +494,7 @@ public:
         m_sprite.setTexture(sharedTex);
         setupAnimations();
         setAnimation("idle");
-        setScale(2.75f);
+        setScale(3.0f);
         collisionWidth = 32.f * 2.75f;
         collisionHeight = 38.f * 2.75f;
         collisionOffsetX = 4.f;
@@ -563,11 +556,16 @@ private:
     }
 };
 
-// ------------------------------------------------------------------ GrenadeSoldier ---
+/// <summary>
+/// ///////////////////////////////////////////GREDNADE SOLDEIR/////////////////////////////////////////
+/// </summary>
 
 class GrenadeSoldier : public Infantry
 {
 public:
+    EnemyType getType() const override {
+        return EnemyType::GrenadeSoldier;
+    }
     /*GrenadeSoldier() : Infantry(20, 1.5f, 180)
     {
         m_texture.loadFromFile("Sprites/grenaderebelsoldier.png");
@@ -581,7 +579,7 @@ public:
         collisionOffsetY = 0.f;
     }*/
 
-    GrenadeSoldier() : Infantry(20, 1.5f, 180)
+    GrenadeSoldier() : Infantry(20, 0.5f, 180)
     {
         static sf::Texture sharedTex;
         static bool loaded = false;
@@ -589,7 +587,7 @@ public:
         m_sprite.setTexture(sharedTex);
         setupAnimations();
         setAnimation("idle");
-        setScale(1.1f);
+        setScale(1.25f);
         collisionWidth = 64.f * 1.1f;
         collisionHeight = 91.f * 1.1f;
         collisionOffsetX = 4.f;
@@ -651,11 +649,13 @@ private:
     }
 };
 
-// ------------------------------------------------------------------ BazookaSoldier ---
+
+///////////////////////////////////////////BAZOOKA SOKDIER/////////////////////////////////////
 
 class BazookaSoldier : public Infantry
 {
 public:
+    EnemyType getType() const override { return EnemyType::BazookaSoldier; }
    /* BazookaSoldier() : Infantry(20, 1.5f, 80)
     {
         m_texture.loadFromFile("Sprites/bazookarebelsoldier.png");
@@ -669,7 +669,7 @@ public:
         collisionOffsetY = 0.f;
     }*/
 
-    BazookaSoldier() : Infantry(20, 1.5f, 80)
+    BazookaSoldier() : Infantry(20, 0.5f, 80)
     {
         static sf::Texture sharedTex;
         static bool loaded = false;
@@ -677,9 +677,9 @@ public:
         m_sprite.setTexture(sharedTex);
         setupAnimations();
         setAnimation("idle");
-        setScale(2.75f);
-        collisionWidth = 36.f * 2.75f;
-        collisionHeight = 45.f * 2.75f;
+        setScale(3.0f);
+        collisionWidth = 36.f * 3.0f;
+        collisionHeight = 36.f * 3.0f;
         collisionOffsetX = 4.f;
         collisionOffsetY = 0.f;
     }
@@ -736,7 +736,7 @@ private:
     }
 };
 
-// ------------------------------------------------------------------ Undead ---
+///////////////////////////////////////////UNDEAD///////////////////////
 
 class Undead : public Enemies
 {
@@ -749,11 +749,14 @@ public:
     }
 };
 
-// ------------------------------------------------------------------ Zombie ---
+/// <summary>
+/// ///////////////////////////////////////////ZOMBIE//////////////////////////////////////////
+/// </summary>
 
 class Zombie : public Undead
 {
 public:
+    EnemyType getType() const override { return EnemyType::Zombie; }
  /*   Zombie() : Undead(5, 1.0f, 60)
     {
         m_texture.loadFromFile("Sprites/zombieenemy.png");
@@ -767,7 +770,7 @@ public:
         collisionOffsetY = 0.f;
     }*/
 
-    Zombie() : Undead(5, 1.0f, 60)
+    Zombie() : Undead(5, 0.5f, 60)
     {
         static sf::Texture sharedTex;
         static bool loaded = false;
@@ -820,11 +823,12 @@ private:
     }
 };
 
-// ------------------------------------------------------------------ Mummy ---
+//////////////////////////////////////////MUMMY//////////////////////////////////////////////////
 
 class Mummy : public Undead
 {
 public:
+    EnemyType getType() const override { return EnemyType::Mummy; }
   /*  Mummy() : Undead(8, 0.8f, 80)
     {
         m_texture.loadFromFile("Sprites/mummyenemy.png");
@@ -838,7 +842,7 @@ public:
         collisionOffsetY = 0.f;
     }*/
 
-    Mummy() : Undead(8, 0.8f, 80)
+    Mummy() : Undead(8, 0.5f, 80)
     {
         static sf::Texture sharedTex;
         static bool loaded = false;
@@ -921,31 +925,31 @@ private:
     }
 };
 
-// ------------------------------------------------------------------ Marine ---
+/////////////////////////////////////////////MARINE//////MARTIAN ACTUALLY///////////////////////////////
 
 class Marine : public Enemies
 {
 public:
-   /* Marine() : Enemies(15, 3.0f, 100)
-    {
-        m_texture.loadFromFile("Sprites/marineenemy.png");
-        static m_sprite.setTexture(m_texture);
-        setupAnimations();
-        setAnimation("idle");
-        setScale(2.75f);
-        collisionWidth = 49.f * 2.75f;   // idle frame width  = 49
-        collisionHeight = 43.f * 2.75f;   // idle frame height = 43
-        collisionOffsetX = 4.f;
-        collisionOffsetY = 0.f;
-    }*/
-    Marine() : Enemies(15, 3.0f, 100)
+    EnemyType getType() const override { return EnemyType::Marine; }
+    bool isHovering() const override { return m_hovering; }
+
+    Marine() : Enemies(15, 1.0f, 100), m_hovering(true), m_landing(false)
     {
         static sf::Texture sharedTex;
         static bool loaded = false;
         if (!loaded) { sharedTex.loadFromFile("Sprites/marineenemy.png"); loaded = true; }
-        m_sprite.setTexture(sharedTex);
+
+        static sf::Texture sharedHoverTex;
+        static bool hoverLoaded = false;
+        if (!hoverLoaded) { sharedHoverTex.loadFromFile("Sprites/hovermarine.png"); hoverLoaded = true; }
+
+        m_hoverTexture = &sharedHoverTex;
+        m_normalTexture = &sharedTex;
+
+        // Start on hover sheet
+        m_sprite.setTexture(*m_hoverTexture);
         setupAnimations();
-        setAnimation("idle");
+        setAnimation("hover");
         setScale(2.75f);
         collisionWidth = 49.f * 2.75f;
         collisionHeight = 43.f * 2.75f;
@@ -953,16 +957,135 @@ public:
         collisionOffsetY = 0.f;
     }
 
-    void attack() override { setAnimation("attack"); }
+    void attack() override { if (!m_hovering) setAnimation("attack"); }
+
+    // Called every frame — suppress normal AI while hovering/landing
+    void updateAI(float dt) override
+    {
+        if (m_hovering || m_landing)
+            return;
+
+        Enemies::updateAI(dt);   // normal idle/walk/attack logic resumes
+    }
 
     void move(float dt) override
     {
+        if (m_hovering || m_landing)
+        {
+            velocityX = 0.f;    // frozen in air while UFO phase is active
+            return;
+        }
         chaseMove(*this, speed, m_state, m_hasTarget, m_targetPos, velocityX, facingRight);
     }
 
+    // takeDamage is intercepted while hovering so shooting the UFO triggers landing
+    // In Marine (Enemy.cpp), already shown in previous answer — just confirm it has override:
+    void takeDamage(int dmg) override
+    {
+        if (m_hovering)
+        {
+            m_hovering = false;
+            m_landing = true;
+            velocityX = 0.f;
+            m_sprite.setTexture(*m_normalTexture);
+            setAnimation("land");
+            return;
+        }
+        Enemies::takeDamage(dmg);
+    }
+
+    void update(float dt, char** lvl, int cell_size, int mapWidth, int mapHeight, int biomeId) override
+    {
+        // While hovering: play hover anim, stay frozen, skip physics gravity
+        if (m_hovering)
+        {
+            // Apply scale manually since we skip Enemies::update()
+            if (facingRight)
+                m_sprite.setScale(-3.f, 3.f);
+            else
+                m_sprite.setScale(-3.f, 3.f);
+
+            if (m_currentAnimation)
+            {
+                m_currentAnimation->update(dt);
+                m_sprite.setTextureRect(m_currentAnimation->getCurrentFrame());
+            }
+            return;   // skip physics entirely so it floats in place
+        }
+
+        // Landing phase: wait for land animation to finish, then go normal
+        if (m_landing)
+        {
+            if (m_currentAnimation &&
+                std::strcmp(m_currentAnimation->name, "land") == 0 &&
+                m_currentAnimation->isFinished())
+            {
+                m_landing = false;
+                setAnimation("idle");   // hand off to normal AI from here
+            }
+        }
+
+        Enemies::update(dt, lvl, cell_size, mapWidth, mapHeight, biomeId);
+    }
+
 private:
+    bool         m_hovering;
+    bool         m_landing;
+    sf::Texture* m_hoverTexture;
+    sf::Texture* m_normalTexture;
+
     void setupAnimations()
     {
+        // ---- hover frames (hovermarine.png) — fill in your own IntRects ----
+        sf::IntRect hover[16];
+        hover[0] = sf::IntRect(5, 7, 44, 38);   // TODO: replace with real rects
+        hover[1] = sf::IntRect(52, 7, 44, 38);
+        hover[2] = sf::IntRect(99, 7, 44, 38);
+        hover[3] = sf::IntRect(146, 7, 43, 38);
+        hover[4] = sf::IntRect(192, 7, 43, 38);
+        hover[5] = sf::IntRect(238, 7, 43, 38);
+        hover[6] = sf::IntRect(284, 8, 43, 37);
+        hover[7] = sf::IntRect(330, 8, 44, 37);
+        hover[8] = sf::IntRect(5, 49, 44, 37);
+        hover[9] = sf::IntRect(52, 49, 44, 37);
+        hover[10] = sf::IntRect(99, 49, 43, 37);
+        hover[11] = sf::IntRect(145, 49, 44, 37);
+        hover[12] = sf::IntRect(192, 48, 43, 38);
+        hover[13] = sf::IntRect(238, 47, 43, 39);
+        hover[14] = sf::IntRect(284, 48, 44, 38);
+        hover[15] = sf::IntRect(331, 47, 44, 39);
+
+        // ---- land frames (hovermarine.png) — fill in your own IntRects ----
+        sf::IntRect land[16];/*
+        land[0] = sf::IntRect(5, 342, 54, 52);
+        land[1] = sf::IntRect(70, 346, 54, 48);
+        land[2] = sf::IntRect(128, 341, 55, 53);
+        land[3] = sf::IntRect(187, 341, 46, 53);
+        land[4] = sf::IntRect(237, 342, 44, 52);
+        land[5] = sf::IntRect(285, 342, 44, 52);
+        land[6] = sf::IntRect(333, 341, 43, 53);*/
+        land[0] = sf::IntRect(10, 18, 49, 43);
+        land[1] = sf::IntRect(64, 18, 49, 43);
+        land[2] = sf::IntRect(118, 19, 48, 42);
+        land[3] = sf::IntRect(171, 19, 48, 42);
+        land[4] = sf::IntRect(224, 19, 48, 42);
+        land[5] = sf::IntRect(277, 19, 48, 42);
+        land[6] = sf::IntRect(330, 19, 48, 42);
+        land[7] = sf::IntRect(383, 19, 48, 42);
+        land[8] = sf::IntRect(436, 19, 48, 42);
+        land[9] = sf::IntRect(489, 19, 48, 42);
+        land[10] = sf::IntRect(542, 19, 48, 42);
+        land[11] = sf::IntRect(595, 19, 48, 42);
+        land[12] = sf::IntRect(648, 19, 48, 42);
+        land[13] = sf::IntRect(701, 19, 48, 42);
+        land[14] = sf::IntRect(754, 19, 48, 42);
+        land[15] = sf::IntRect(807, 19, 48, 42);
+
+        Animation a;
+        a.setup("hover", hover, 16, 16.f, true);   addAnimation("hover", a);
+        a.setup("land", land, 16, 10.f, false);  addAnimation("land", a);
+
+        // ---- normal combat animations (marineenemy.png) ----
         sf::IntRect idle[16];
         idle[0] = sf::IntRect(10, 18, 49, 43);
         idle[1] = sf::IntRect(64, 18, 49, 43);
@@ -1019,13 +1142,13 @@ private:
         attack[16] = sf::IntRect(379, 358, 53, 37);
         attack[17] = sf::IntRect(10, 400, 53, 42);
 
-        Animation a;
-        a.setup("idle", idle, 16, 16.f, true);  addAnimation("idle", a);
-        a.setup("walk", walk, 16, 10.f, true);  addAnimation("walk", a);
-        a.setup("attack", attack, 18, 10.f, false); addAnimation("attack", a);
+        a.setup("idle", idle, 16, 16.f, true);   addAnimation("idle", a);
+        a.setup("walk", walk, 16, 10.f, true);   addAnimation("walk", a);
+        a.setup("attack", attack, 18, 10.f, false);  addAnimation("attack", a);
     }
 };
-// ------------------------------------------------------------------ Paratrooper helper ---
+
+//PARATROOPER HELPER
 
 static EnemyType randomInfantryType()
 {
@@ -1038,10 +1161,13 @@ static EnemyType randomInfantryType()
     return types[rand() % 4];
 }
 
-// ------------------------------------------------------------------ Paratrooper ---
+/// <summary>
+/// ////////////////////////////////PARATROOPER///////////////////////////////////////////////////////
+/// </summary>
 class Paratrooper : public Infantry
 {
 public:
+    EnemyType getType() const override { return EnemyType::Paratrooper; }
   /*  Paratrooper()
         : Infantry(0, 0.f, 999)
         , m_landAs(randomInfantryType())
@@ -1083,7 +1209,7 @@ public:
         if (m_landing || m_landed)
             velocityX = 0.f;
         else
-            velocityX = 0.f;  // always falls straight down
+            velocityX = 0.f;  
     }
 
     Enemies* getLandedReplacement() override
@@ -1191,106 +1317,7 @@ private:
     }
 };
 
-/*
-class Paratrooper : public Infantry
-{
-public:
-    Paratrooper()
-        : Infantry(0, 0.f, 999)
-        , m_landAs(randomInfantryType())
-        , m_landed(false)
-        , m_replacement(nullptr)
-    {
-        m_texture.loadFromFile("Sprites/paratrooper.png");
-        m_sprite.setTexture(m_texture);
-        setupAnimations();
-        setAnimation("fall");
-        setScale(2.75f);
-        collisionWidth = 30.f * 2.75f;
-        collisionHeight = 50.f * 2.75f;
-        collisionOffsetX = 4.f;
-        collisionOffsetY = 0.f;
-    }
 
-    void attack() override {}
-
-    void move(float dt) override
-    {
-        velocityX = 0.f;
-    }
-
-    Enemies* getLandedReplacement() override
-    {
-        if (!m_landed) return nullptr;
-        Enemies* r = m_replacement;
-        m_replacement = nullptr;
-        return r;
-    }
-
-    void update(float dt, char** lvl, int cell_size, int mapWidth, int mapHeight) override
-    {
-        if (m_landed) return;
-
-        Enemies::update(dt, lvl, cell_size, mapWidth, mapHeight);
-
-        if (onGround && !m_landed)
-        {
-            m_landed = true;
-            m_replacement = Enemies::createEnemy(m_landAs);
-            m_replacement->setPosition(m_sprite.getPosition().x,
-                m_sprite.getPosition().y);
-            if (m_hasTarget)
-                m_replacement->setTarget(m_targetPos);
-        }
-    }
-
-private:
-    EnemyType m_landAs;
-    bool      m_landed;
-    Enemies* m_replacement;
-
-    void setupAnimations()
-    {
-        sf::IntRect fall[10];
-        fall[0] = sf::IntRect(243, 6, 109, 162);
-        fall[1] = sf::IntRect(48, 0, 48, 64);
-        fall[2] = sf::IntRect(96, 0, 48, 64);
-        fall[3] = sf::IntRect(144, 0, 48, 64);
-
-        Animation a;
-        a.setup("fall", fall, 4, 6.f, true);
-        addAnimation("fall", a);
-    }
-};
-*/
-// ------------------------------------------------------------------ Factory ---
-
-/*Enemies* Enemies::createEnemy(EnemyType type)
-{
-    switch (type)
-    {
-    case EnemyType::RebelSoldier:   EnemyType->mScoreValue = 50; return new RebelSoldier();
-    case EnemyType::ShieldedSoldier: return new ShieldedSoldier();
-    case EnemyType::GrenadeSoldier:  return new GrenadeSoldier();
-    case EnemyType::BazookaSoldier:  return new BazookaSoldier();
-    case EnemyType::Zombie:          return new Zombie();
-    case EnemyType::Mummy:           return new Mummy();
-    case EnemyType::Marine:          return new Marine();
-    case EnemyType::Paratrooper: return new Paratrooper();
-    default:                         return nullptr;
-
-    case EnemyType::RebelSoldier:
-        e->mScoreValue = 50;   break;
-    case EnemyType::ShieldedSoldier:
-        e->mScoreValue = 75;   break;
-    case EnemyType::GrenadeSoldier:
-    case EnemyType::BazookaSoldier:
-        e->mScoreValue = 100;  break;
-    case EnemyType::Zombie:
-        e->mScoreValue = 100;  break;
-    case EnemyType::Mummy:
-        e->mScoreValue = 150;  break;
-    }*/
 
     Enemies* Enemies::createEnemy(EnemyType type)
     {

@@ -31,16 +31,17 @@ class LoadingState : public GameState
 
         void enter() override
         {
-            font.loadFromFile("Fonts/metal-slug.ttf");
+            font.loadFromFile("Sprites/Font/metal-slug.ttf");
 
             text.setFont(font);
-            text.setString("Loading...");
+            text.setString("LOADING...");
             text.setCharacterSize(40);
             text.setFillColor(sf::Color::White);
-            text.setPosition(700.f, 450.f);
+            text.setPosition(600.f, 750.f);
 
-            loadTex.loadFromFile("Sprites/Menu/loading.png");
+            loadTex.loadFromFile("Sprites/Menu/loadingsc.png");
             lbg.setTexture(loadTex);
+            lbg.setScale(1.5, 1.5);
         }
 
         void update(float dt) override

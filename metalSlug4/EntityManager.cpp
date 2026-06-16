@@ -18,8 +18,6 @@
 //}
 //
 //// ============================================================
-//// addEntity
-//// ============================================================
 //// Store the pointer at the next available slot.
 //// We take ownership — the caller must NOT delete the entity.
 //// ============================================================
@@ -30,9 +28,6 @@
 //    count++;
 //}
 //
-//// ============================================================
-//// update
-//// ============================================================
 //// Call update() on every active entity.
 //// Passing Level* lets entities do their own collision checks
 //// (e.g. player checks if the tile below is solid = gravity).

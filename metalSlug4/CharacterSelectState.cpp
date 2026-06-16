@@ -85,7 +85,7 @@ void CharacterSelectState::handleInput(sf::RenderWindow& window)
     bool enterNow = sf::Keyboard::isKeyPressed(sf::Keyboard::Enter);
     if (enterNow && !mEnterWasPressed)
     {
-        // selectedCharacter is now 0-3 (index), so pass +1 as the player count
+   
         nextState = new PlayState(1600, 900, 0, selectedCharacter + 1);
         isDone = true;
     }

@@ -38,7 +38,7 @@ void ProjectileWeapon::update(float dt)
 
 
 Pistol::Pistol(Texture& tex)
-    : ProjectileWeapon("pistol", 3, 6.f, 0, true), mTexture(tex)
+    : ProjectileWeapon("pistol", 20, 6.f, 0, true), mTexture(tex)
 {
     mBulletFrames[0] = IntRect(15, 82, 61, 10);
     mBulletFrames[1] = IntRect(82, 82, 60, 12);
@@ -49,9 +49,10 @@ Pistol::Pistol(Texture& tex)
         mBullets[i].active = false;
         mBullets[i].sprite.setTexture(mTexture);
         mBullets[i].sprite.setTextureRect(mBulletFrames[0]);
+        mBullets[i].sprite.setOrigin(mBulletFrames[0].width / 2.f, mBulletFrames[0].height / 2.f);
     }
 }
-
+/*
 void Pistol::fire(float originX, float originY, bool facingRight, float aimAngle)
 {
     if (!canFire()) return;
@@ -71,6 +72,35 @@ void Pistol::fire(float originX, float originY, bool facingRight, float aimAngle
             break;
         }
     }
+}*/
+void Pistol::fire(float originX, float originY, bool facingRight, float aimAngle)
+{
+    if (!canFire()) return;
+
+    for (int i = 0; i < MAX_PISTOL_BULLETS; i++)
+    {
+        if (!mBullets[i].active)
+        {
+            float rad = aimAngle * 3.14159f / 180.f;
+
+            mBullets[i].active = true;
+            mBullets[i].damage = mDamage;
+
+            mBullets[i].vx = mBulletSpeed * cos(rad);
+            mBullets[i].vy = -mBulletSpeed * sin(rad);
+
+            if (!facingRight)
+              mBullets[i].vx = -mBullets[i].vx;
+
+            mBullets[i].sprite.setPosition(originX, originY);
+            mBullets[i].sprite.setScale(facingRight ? 0.5f : 0.5f, 0.5f); // ADD THIS
+            mBullets[i].sprite.setTextureRect(mBulletFrames[0]);             // ADD THIS
+            mBullets[i].sprite.setRotation(facingRight ? -aimAngle : (180.f + aimAngle));
+
+            mFireCooldown = 1.f / mFireRate;
+            break;
+        }
+    }
 }
 
 void Pistol::advanceProjectiles(float dt)
@@ -79,7 +109,11 @@ void Pistol::advanceProjectiles(float dt)
     {
         if (!mBullets[i].active) continue;
 
-        mBullets[i].sprite.move(mBullets[i].vx, 0.f);
+        mBullets[i].sprite.move(
+            mBullets[i].vx,
+            mBullets[i].vy
+        );
+        //mBullets[i].sprite.move(mBullets[i].vx, 0.f);
 
         mBullets[i].frameTimer += dt;
         if (mBullets[i].frameTimer >= 0.05f)
@@ -135,7 +169,7 @@ void Pistol::draw(sf::RenderWindow& window)
 /////////////////////////////////////////////HEAVY MACHINE GUN///////////////////////////////////////////////
 
 HeavyMachineGun::HeavyMachineGun(Texture& tex)
-    : ProjectileWeapon("hmg", 3, 8.f, 200, false), mTexture(tex)
+    : ProjectileWeapon("hmg", 20, 8.f, 200, false), mTexture(tex)
 {
     // fill in IntRects from ammo.png bullet row
     mBulletFrames[0] = IntRect(15, 82, 61, 10);
@@ -147,6 +181,8 @@ HeavyMachineGun::HeavyMachineGun(Texture& tex)
         mBullets[i].active = false;
         mBullets[i].sprite.setTexture(mTexture);
         mBullets[i].sprite.setTextureRect(mBulletFrames[0]);
+        mBullets[i].sprite.setOrigin(mBulletFrames[0].width / 2.f, mBulletFrames[0].height / 2.f);
+    
     }
 }
 
@@ -182,6 +218,39 @@ void HeavyMachineGun::fire(float originX, float originY, bool facingRight, float
     {
         if (!mBullets[i].active)
         {
+            float rad = aimAngle * 3.14159f / 180.f;
+
+            mBullets[i].active = true;
+            mBullets[i].damage = mDamage;
+            mBullets[i].currentFrame = 0;
+            mBullets[i].frameTimer = 0.f;
+
+            mBullets[i].vx = mBulletSpeed * cos(rad);   // angle-aware
+            mBullets[i].vy = -mBulletSpeed * sin(rad);  // negative = up in SFML
+
+           if (!facingRight)
+             mBullets[i].vx = -mBullets[i].vx;
+
+            mBullets[i].sprite.setPosition(originX, originY);
+            mBullets[i].sprite.setScale(facingRight ? 1.f : 1.f, 1.f);
+            mBullets[i].sprite.setTextureRect(mBulletFrames[0]);
+            mBullets[i].sprite.setRotation(facingRight ? -aimAngle : (180.f + aimAngle));
+
+            mFireCooldown = 1.f / mFireRate;
+            mAmmo--;
+            break;
+        }
+    }
+}
+
+/*
+void HeavyMachineGun::fire(float originX, float originY, bool facingRight, float aimAngle)
+{
+    if (!canFire() || isEmpty()) return;
+    for (int i = 0; i < MAX_BULLETS; i++)
+    {
+        if (!mBullets[i].active)
+        {
             mBullets[i].active = true;
             mBullets[i].damage = mDamage;
             mBullets[i].currentFrame = 0;
@@ -195,7 +264,7 @@ void HeavyMachineGun::fire(float originX, float originY, bool facingRight, float
             break;
         }
     }
-}
+}*/
 
 /*void HeavyMachineGun::fire(float originX, float originY, bool facingRight, float aimAngle)
 {
@@ -219,7 +288,8 @@ void HeavyMachineGun::advanceProjectiles(float dt)
     {
         if (!mBullets[i].active) continue;
 
-        mBullets[i].sprite.move(mBullets[i].vx, 0.f);
+        mBullets[i].sprite.move(mBullets[i].vx, mBullets[i].vy);
+        //mBullets[i].sprite.move(mBullets[i].vx, 0.f);
 
         mBullets[i].frameTimer += dt;
         if (mBullets[i].frameTimer >= 0.05f)
@@ -246,7 +316,7 @@ void HeavyMachineGun::advanceProjectiles(float dt)
 ////////////////////////////////////////ROCKET LAUNCHER//////////////////////////////////////////////////////
 
 RocketLauncher::RocketLauncher(Texture& tex)
-    : ProjectileWeapon("rocket", 5, 0.5f, 10, false), mTexture(tex)
+    : ProjectileWeapon("rocket", 100, 0.5f, 10, false), mTexture(tex)
 {
     // fill in IntRects from ammo.png rocket row
     mRocketFrames[0] = IntRect(15, 186, 120, 30);
@@ -382,7 +452,7 @@ void RocketLauncher::advanceProjectiles(float dt)
 //////////////////////////////////////////FLAME SHOT//////////////////////////////////////////////////////////////
 
 FlameShot::FlameShot(Texture& tex)
-    : Weapon("flameshot", 2, 30.f, 300, false), mTexture(tex)
+    : Weapon("flameshot", 20, 30.f, 300, false), mTexture(tex)
 {
     // fill in IntRects from ammo.png flame row
     mFrames[0] = IntRect(14, 131, 52, 29);
@@ -418,7 +488,7 @@ void FlameShot::resolveHits(Enemies** enemies, int count, int cellSize, int& sco
         if (inDir && dy > -(float)cellSize && dy < (float)cellSize)
         {
             // 2 HP per second — multiply by dt approximation (1/60)
-            enemies[e]->takeDamage(1);   // call this every frame; 60fps ≈ 60/sec, scale as needed
+            enemies[e]->takeDamage(20);   // call this every frame; 60fps ≈ 60/sec, scale as needed
             if (enemies[e]->wasJustKilled())
             {
                 score += enemies[e]->getScoreValue();

@@ -21,24 +21,28 @@
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="CharacterSelectState.cpp" />
-    <ClCompile Include="DamageableEntity.cpp" />
+    <ClCompile Include="Collectible.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameState.cpp" />
     <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="LevelManager.cpp" />
+    <ClCompile Include="LoadingState.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MenuState.cpp" />
     <ClCompile Include="PlayState.cpp" />
+    <ClCompile Include="ScoreManager.cpp" />
     <ClCompile Include="Soldier.cpp" />
+    <ClCompile Include="Transformation.cpp" />
     <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="CharacterSelectState.h" />
-    <ClInclude Include="DamageableEntity.h" />
+    <ClInclude Include="Collectible.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityManager.h" />
@@ -49,8 +53,10 @@
     <ClInclude Include="LevelManager.h" />
     <ClInclude Include="MenuState.h" />
     <ClInclude Include="PlayState.h" />
+    <ClInclude Include="ScoreManager.h" />
     <ClInclude Include="Soldier.h" />
     <ClInclude Include="LoadingState.h" />
+    <ClInclude Include="TransformationState.h" />
     <ClInclude Include="Weapon.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

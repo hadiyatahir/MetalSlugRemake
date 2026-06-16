@@ -1,3 +1,7 @@
+//HADIYA TAHIR   I250960
+//BISMA FAROOW   I250687
+
+
 #include <iostream>
 #include <fstream>
 #include <cmath>

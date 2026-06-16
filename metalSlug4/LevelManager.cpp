@@ -30,8 +30,9 @@ void LevelManager::loadLevel(int biomeId)
     //level->settile(9, 22, 'g');
     
         delete level;
-        level = new Level(150, 40, 64);
-        level->loadTextures();
+        level = new Level(150, 50, 64);
+        //level->loadTextures();
+        level->setBiome(biomeId);
 
         // aerial biome — cols 0-36, high ground around row 4
         //for (int col = 0; col < 37; col++)
@@ -55,85 +56,20 @@ void LevelManager::loadLevel(int biomeId)
 
 
         if (biomeId == 0) {
-            for (int col = 0; col < 150; col++)
+
+            for (int col = 0; col < 43; col++)
             {
-                level->setTile(18, col, 'g');
-                level->setTile(19, col, 'g');
-            }
-
-            for (int col = 8; col < 15; col++)
-                level->setTile(17, col, 'g');
-
-            for (int col = 15; col < 20; col++)
-                level->setTile(16, col, 'g');
-
-            for (int col = 32; col < 38; col++)
-                level->setTile(17, col, 'g');
-
-            for (int col = 38; col < 42; col++)
-                level->setTile(16, col, 'g');
-
-            for (int col = 12; col < 18; col++)
                 level->setTile(12, col, 'g');
-
-            for (int col = 25; col < 33; col++)
-                level->setTile(10, col, 'g');
-
-            for (int col = 45; col < 52; col++)
-                level->setTile(13, col, 'g');
-
-            for (int col = 60; col < 68; col++)
-                level->setTile(9, col, 'g');
-
-            for (int col = 80; col < 88; col++)
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 42; col < 150; col++)
+            {
                 level->setTile(14, col, 'g');
-        }
+                //level->setTile(13, col, 'g');
+            }//this is valid
 
 
-        if (biomeId == 1) {
-            for (int col = 0; col < 150; col++)
-            {
-                level->setTile(18, col, 's');
-                level->setTile(19, col, 's');
-            }
-
-            for (int col = 8; col < 15; col++)
-                level->setTile(17, col, 's');
-
-            for (int col = 15; col < 20; col++)
-                level->setTile(16, col, 's');
-
-            for (int col = 32; col < 38; col++)
-                level->setTile(17, col, 's');
-
-            for (int col = 38; col < 42; col++)
-                level->setTile(16, col, 's');
-
-            for (int col = 12; col < 18; col++)
-                level->setTile(12, col, 's');
-
-            for (int col = 25; col < 33; col++)
-                level->setTile(10, col, 's');
-
-            for (int col = 45; col < 52; col++)
-                level->setTile(13, col, 's');
-
-            for (int col = 60; col < 68; col++)
-                level->setTile(9, col, 's');
-
-            for (int col = 80; col < 88; col++)
-                level->setTile(14, col, 's');
-
-
-
-
-           /* for (int col = 0; col < 150; col++)
-            {
-                level->setTile(18, col, 'g');
-                level->setTile(19, col, 'g');
-            }
-
-            for (int col = 8; col < 15; col++)
+        /*    for (int col = 8; col < 15; col++)
                 level->setTile(17, col, 'g');
 
             for (int col = 15; col < 20; col++)
@@ -162,6 +98,127 @@ void LevelManager::loadLevel(int biomeId)
         }
 
 
+        if (biomeId == 1) {
+            for (int col = 0; col < 8; col++)
+            {
+                level->setTile(17, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 7; col < 15; col++)
+            {
+                level->setTile(16, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 12; col < 15; col++)
+            {
+                level->setTile(15, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 15; col < 20; col++)
+            {
+                level->setTile(14, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 20; col < 23; col++)
+            {
+                level->setTile(13, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 23; col < 32; col++)
+            {
+                level->setTile(12, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 32; col < 33; col++)
+            {
+                level->setTile(11, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 33; col < 34; col++)
+            {
+                level->setTile(10, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 34; col < 35; col++)
+            {
+                level->setTile(9, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 35; col < 36; col++)
+            {
+                level->setTile(8, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 36; col < 37; col++)
+            {
+                level->setTile(8, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 37; col < 38; col++)
+            {
+                level->setTile(8, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 36; col < 55; col++)
+            {
+                level->setTile(16, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 39; col < 45; col++)
+            {
+                level->setTile(15, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 45; col < 55; col++)
+            {
+                level->setTile(14, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 47; col < 55; col++)
+            {
+                level->setTile(13, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 55; col < 67; col++)
+            {
+                level->setTile(12, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 67; col < 68; col++)
+            {
+                level->setTile(13, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 68; col < 69; col++)
+            {
+                level->setTile(14, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 69; col < 70; col++)
+            {
+                level->setTile(15, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 70; col < 71; col++)
+            {
+                level->setTile(16, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+
+            for (int col = 71; col < 72; col++)
+            {
+                level->setTile(17, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+            for (int col = 72; col < 100; col++)
+            {
+                level->setTile(18, col, 'g');
+                //level->setTile(13, col, 'g');
+            }
+
+        }
+
+
         if (biomeId == 2) {
 
         }
@@ -171,10 +228,70 @@ void LevelManager::loadLevel(int biomeId)
 
 }
 
+void LevelManager::update(float playerWorldX, float playerWorldY)
+{
+   /* if (level == nullptr) return;
 
+    int desiredX = (int)playerWorldX - screenWidth / 2;
+    int desiredY = (int)playerWorldY - screenHeight / 4;
 
+    int maxCamX = level->getPixelWidth() - screenWidth;
+    //int maxCamY = level->getPixelHeight() - screenHeight;
 
+    // safety check — if level is narrower than screen don't scroll
+    if (maxCamX < 0) maxCamX = 0;
+   // if (maxCamY < 0) maxCamY = 0;
 
+    if (desiredX < 0)       desiredX = 0;
+    if (desiredX > maxCamX) desiredX = maxCamX;
+
+    if (desiredY < 0)       desiredY = 0;
+    //if (desiredY > maxCamY) desiredY = maxCamY;
+
+    int minCamY = 0;    // locked near row 14
+    int maxCamY = 100; // only 50px of drift allowed
+
+    if (desiredY < minCamY) desiredY = minCamY;
+    if (desiredY > maxCamY) desiredY = maxCamY;
+
+   // camY = desiredY;
+
+    camX = desiredX;
+    camY = desiredY;*/
+
+    if (level == nullptr) return;
+
+    int desiredX = (int)playerWorldX - screenWidth / 2;
+    int desiredY = (int)playerWorldY - screenHeight / 2;
+
+    int maxCamX = level->getPixelWidth() - screenWidth;
+
+    if (level->getBiome() == 1)
+    {
+        
+        if (desiredX < 0)       desiredX = 0;
+        if (desiredX > maxCamX) desiredX = maxCamX;
+        int minCamY = 0;
+        int maxCamY = level->getPixelHeight() - screenHeight;
+        if (maxCamY < 0) maxCamY = 0;
+        if (desiredY < minCamY) desiredY = minCamY;
+        if (desiredY > maxCamY) desiredY = maxCamY;
+    }
+    else
+    {
+        if (desiredX < 0)       desiredX = 0;
+        if (desiredX > maxCamX) desiredX = maxCamX;
+        int minCamY = 0;
+        int maxCamY = 100; // original locked behaviour for other biomes
+        if (desiredY < minCamY) desiredY = minCamY;
+        if (desiredY > maxCamY) desiredY = maxCamY;
+    }
+
+    camX = desiredX;  // ← was missing
+    camY = desiredY;
+}
+
+/*
 void LevelManager::update(float playerWorldX, float playerWorldY)
 {
     if (level == nullptr) return;
@@ -197,7 +314,7 @@ void LevelManager::update(float playerWorldX, float playerWorldY)
 
     camX = desiredX;
     camY = desiredY;
-}
+}*/
 
 void LevelManager::draw(sf::RenderWindow& window)
 {

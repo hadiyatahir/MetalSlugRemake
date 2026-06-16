@@ -32,12 +32,12 @@ Level::~Level()  //opp of constructor
 
 void Level::loadTextures()
 {
-    grassTex.loadFromFile("Sprites/blocks/grass_block_side.png");
+    grassTex.loadFromFile("Sprites/blocks/grass.png");
     //waterTex.loadFromFile("Sprites/blocks/water.png");
-   stoneTex.loadFromFile("Sprites/blocks/stone.png");
-    plainsBgTex.loadFromFile("Sprites/Biomes/plainsH.png");
-    aerialBgTex.loadFromFile("Sprites/Biomes/aerialH.png");
-    aquaticBgTex.loadFromFile("Sprites/Biomes/aquaticH.png");
+   stoneTex.loadFromFile("Sprites/blocks/grass_block_side.png");
+    plainsBgTex.loadFromFile("Sprites/Biomes/plainssss.png");
+    aerialBgTex.loadFromFile("Sprites/Biomes/aerialbiome.png");
+    aquaticBgTex.loadFromFile("Sprites/Biomes/aquatic.png");
 }
 
 char Level::getTile(int row, int col) const
@@ -86,8 +86,17 @@ void Level::draw(sf::RenderWindow& window,
             else continue; // unknown tile, skip
 
             // Convert world position to screen position
-            float screenX = (float)(col * cellSize - camX);
-            float screenY = (float)(row * cellSize - camY);
+            float screenX = (float)(col * cellSize);
+            float screenY = (float)(row * cellSize);
+            if (biomeId == 0) {
+                screenX = screenX;
+                screenY = screenY;
+            }
+
+            else if (biomeId == 1) {
+                screenX -= camX;
+                screenY -= camY;
+            }
 
             tileSprite.setPosition(screenX, screenY);
             window.draw(tileSprite);
@@ -300,10 +309,29 @@ void Level::drawBackground(sf::RenderWindow& window, int camX, int camY, int scr
 
   
     //window.draw(bgSprite);
+    if (biomeId == 0) {
+        bgSprite.setTexture(plainsBgTex);
 
-    bgSprite.setTexture(currentBackgroundTexture);
-    bgSprite.setPosition(-camX, -camY);
+        bgSprite.setScale(4.15f, 4.15f);
+
+        bgSprite.setPosition(-camX, -490);
+        
+       
+    }
+    else if (biomeId == 1) {
+        bgSprite.setTexture(aerialBgTex);
+        bgSprite.setScale(3.25f, 3.25f);
+        bgSprite.setPosition(-camX, -camY + 5);
+    }
+    else {
+        bgSprite.setTexture(aquaticBgTex);
+        bgSprite.setScale(1.25, 1.25);
+        bgSprite.setPosition(-camX - 50, -camY - 90);
+    }
+   
+
     window.draw(bgSprite);
+     //window.draw(bgSprite);
 
 
 
@@ -322,7 +350,6 @@ void Level::setBiome(int biome)
     else
         currentBackgroundTexture = aquaticBgTex;
 
-    //bgSprite.setTexture(currentBackgroundTexture);
-
-    //window.draw(bgSprite);
+   // bgSprite.setTexture(currentBackgroundTexture);
+   // window.draw(bgSprite);
 }
